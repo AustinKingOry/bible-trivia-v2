@@ -51,8 +51,8 @@ export function QuestionPanel({
         >
           {cat.icon} {cat.name}
         </span>
-        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase border ${diffBadge[difficulty] ?? ''}`}>
-          {difficulty}
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase border ${diffBadge[question.difficulty] ?? diffBadge[difficulty] ?? ''}`}>
+          {question.difficulty}
         </span>
         {isStealWindow && (
           <span

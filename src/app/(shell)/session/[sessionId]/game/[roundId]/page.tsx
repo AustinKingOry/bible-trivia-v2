@@ -160,6 +160,7 @@ export default function GamePage({
     : '#C0392B'
 
   const diffBadge: Record<string, string> = {
+    all: 'text-[#F5C842] border-[#F5C842]/50 bg-[#F5C842]/10',
     easy: 'text-[#6DFFAA] border-[#1A8A4A]/50 bg-[#1A8A4A]/15',
     medium: 'text-[#F5C842] border-[#F5C842]/50 bg-[#F5C842]/10',
     hard: 'text-[#FF8A80] border-[#C0392B]/50 bg-[#C0392B]/15',

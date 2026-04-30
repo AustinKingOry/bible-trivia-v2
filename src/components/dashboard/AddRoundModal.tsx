@@ -6,6 +6,7 @@ import { CATEGORIES } from '@/lib/data'
 import type { Difficulty } from '@/types'
 
 const DIFFS: { id: Difficulty; label: string; color: string }[] = [
+  { id: 'all',    label: '⭐ All',    color: '#F5C842' },
   { id: 'easy',   label: '🟢 Easy',   color: '#6DFFAA' },
   { id: 'medium', label: '🟡 Medium', color: '#F5C842' },
   { id: 'hard',   label: '🔴 Hard',   color: '#FF8A80' },
@@ -18,24 +19,29 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
   const existingRounds = getSessionRounds(sessionId)
 
   const [categoryId, setCategoryId] = useState<string>(CATEGORIES[0].id)
-  const [difficulty, setDifficulty] = useState<Difficulty>('easy')
+  const [difficulty, setDifficulty] = useState<Difficulty>('all')
   const [questionLimit, setQuestionLimit] = useState('')
   const [name, setName] = useState('')
 
   const available = getAvailableQuestionCount(categoryId, difficulty)
   const cat = CATEGORIES.find((c) => c.id === categoryId)!
 
+  const diffLabel = DIFFS.find((d) => d.id === difficulty)?.label ?? 'All'
+  const defaultName = `Round ${existingRounds.length + 1} — ${cat.name}`
+
   const handleCreate = () => {
-    const roundName = name.trim() || `Round ${existingRounds.length + 1} — ${cat.name}`
+    const roundName = name.trim() || defaultName
     const limit = questionLimit ? parseInt(questionLimit) : undefined
     createRound(sessionId, { name: roundName, categoryId, difficulty, questionLimit: limit })
     onClose()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
       <div className="panel w-full max-w-md animate-slide-up" style={{ border: '1.5px solid rgba(245,200,66,0.35)' }}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display text-2xl tracking-widest text-[#F5C842]">ADD ROUND</h2>
@@ -51,7 +57,7 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={`Round ${existingRounds.length + 1} — ${cat.name}`}
+            placeholder={defaultName}
             className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
             style={{
               background: 'rgba(255,255,255,0.06)',
@@ -71,7 +77,7 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
               <button
                 key={c.id}
                 onClick={() => setCategoryId(c.id)}
-                className="text-left p-2.5 rounded-lg transition-all text-sm"
+                className="text-left p-2.5 rounded-lg transition-all"
                 style={categoryId === c.id
                   ? { background: 'rgba(245,200,66,0.12)', border: '1.5px solid #F5C842' }
                   : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent' }
@@ -86,15 +92,20 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
 
         {/* Difficulty */}
         <div className="mb-4">
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Difficulty</div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase">Difficulty</div>
+            {difficulty === 'all' && (
+              <span className="text-[10px] text-[#F5C842]">All difficulties shuffled together</span>
+            )}
+          </div>
           <div className="flex gap-2">
             {DIFFS.map((d) => (
               <button
                 key={d.id}
                 onClick={() => setDifficulty(d.id)}
-                className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all"
                 style={difficulty === d.id
-                  ? { background: 'rgba(245,200,66,0.12)', border: `1.5px solid ${d.color}`, color: d.color }
+                  ? { background: `${d.color}18`, border: `1.5px solid ${d.color}`, color: d.color }
                   : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent', color: '#9BA8C4' }
                 }
               >
@@ -102,7 +113,10 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-[#9BA8C4] mt-1.5">{available} question{available !== 1 ? 's' : ''} available</p>
+          <p className="text-[10px] text-[#9BA8C4] mt-1.5">
+            {available} question{available !== 1 ? 's' : ''} available
+            {difficulty === 'all' && ' across all difficulties'}
+          </p>
         </div>
 
         {/* Question limit */}

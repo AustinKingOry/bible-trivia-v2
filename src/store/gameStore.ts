@@ -157,7 +157,10 @@ export const useGameStore = create<GameStore>()(
         const _teams = get().getSessionTeams(round.sessionId)
         if (_teams.length === 0) { console.warn('startRound: no teams in session'); return }
         const allQs = getAllQuestions()
-        const pool = allQs.filter((q) => q.categoryId === round.categoryId && q.difficulty === round.difficulty)
+        const pool = allQs.filter((q) =>
+          q.categoryId === round.categoryId &&
+          (round.difficulty === 'all' || q.difficulty === round.difficulty)
+        )
         const shuffled = [...pool].sort(() => Math.random() - 0.5)
         const limited = round.questionLimit ? shuffled.slice(0, round.questionLimit) : shuffled
         const queue = limited.map((q) => q.id)
@@ -303,7 +306,9 @@ export const useGameStore = create<GameStore>()(
       getRoundActivities: (roundId) =>
         Object.values(get().activities).filter((a) => a.roundId === roundId).sort((a,b) => b.createdAt - a.createdAt),
       getAvailableQuestionCount: (categoryId, difficulty) =>
-        get().getAllQuestions().filter((q) => q.categoryId === categoryId && q.difficulty === difficulty).length,
+        get().getAllQuestions().filter((q) =>
+          q.categoryId === categoryId && (difficulty === 'all' || q.difficulty === difficulty)
+        ).length,
     }),
     {
       name: 'btgms-v3',

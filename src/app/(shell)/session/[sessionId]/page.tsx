@@ -64,6 +64,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const getCatName = (id: string) => CATEGORIES.find((c) => c.id === id)?.name ?? id
 
   const diffColor: Record<string, string> = {
+    all: 'text-[#F5C842]',
     easy: 'text-[#6DFFAA]',
     medium: 'text-[#F5C842]',
     hard: 'text-[#FF8A80]',
@@ -181,7 +182,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                     <div className="text-xs text-[#9BA8C4] flex gap-3 flex-wrap">
                       <span>{getCatName(round.categoryId)}</span>
                       <span className={`capitalize font-semibold ${diffColor[round.difficulty]}`}>
-                        {round.difficulty}
+                        {round.difficulty === 'all' ? '⭐ All difficulties' : round.difficulty}
                       </span>
                       {round.questionLimit && <span>Limit: {round.questionLimit}q</span>}
                       {round.status !== 'pending' && (

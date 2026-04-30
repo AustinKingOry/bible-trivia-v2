@@ -1,3 +1,4 @@
+// ─── Sync-ready base ─────────────────────────────────────────────────────────
 export interface SyncBase {
   id: string
   createdAt: number
@@ -7,7 +8,7 @@ export interface SyncBase {
 }
 
 // ─── Enums / unions ───────────────────────────────────────────────────────────
-export type Difficulty    = 'easy' | 'medium' | 'hard'
+export type Difficulty    = 'all' | 'easy' | 'medium' | 'hard'
 export type TurnMode      = 'per-question-rotation' | 'continuous'
 export type AnswerResult  = 'correct' | 'wrong' | 'pass' | 'steal'
 export type ActivityReason= 'correct' | 'wrong' | 'steal'
