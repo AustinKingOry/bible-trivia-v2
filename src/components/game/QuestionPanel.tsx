@@ -1,6 +1,6 @@
 'use client'
 
-import type { Category, Question, TimerPhase } from '@/types'
+import type { Category, Question, QuestionPhase } from '@/types'
 
 interface Props {
   question: Question | undefined
@@ -15,7 +15,7 @@ interface Props {
   timerPct: number
   timerColor: string
   timeLeft: number
-  phase: TimerPhase
+  phase: QuestionPhase
 }
 
 export function QuestionPanel({
@@ -31,8 +31,10 @@ export function QuestionPanel({
     )
   }
 
-  const isStealWindow = phase === 'steal-window'
-  const borderColor = isStealWindow ? '#2E86DE' : '#F5C842'
+  const isStealPhase = phase === 'steal-offered' || phase === 'team2-answering'
+  const isDone = phase === 'done'
+  const borderColor = isStealPhase ? '#2E86DE' : isDone ? 'rgba(245,200,66,0.4)' : '#F5C842'
+  const showTimerBar = timeLeft > 0 && phase !== 'steal-offered'
 
   return (
     <div
@@ -40,7 +42,7 @@ export function QuestionPanel({
       style={{
         background: '#142240',
         border: `2px solid ${borderColor}`,
-        boxShadow: isStealWindow ? `0 0 24px rgba(46,134,222,0.25)` : undefined,
+        boxShadow: isStealPhase ? '0 0 28px rgba(46,134,222,0.2)' : undefined,
       }}
     >
       {/* Meta row */}
@@ -51,22 +53,30 @@ export function QuestionPanel({
         >
           {cat.icon} {cat.name}
         </span>
+
         <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase border ${diffBadge[question.difficulty] ?? diffBadge[difficulty] ?? ''}`}>
           {question.difficulty}
         </span>
-        {isStealWindow && (
-          <span
-            className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase animate-pulse"
-            style={{ background: 'rgba(46,134,222,0.2)', border: '1px solid rgba(46,134,222,0.5)', color: '#74B9FF' }}
-          >
-            ⚡ Steal window
+
+        {/* Phase badge inside card */}
+        {phase === 'steal-offered' && (
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase animate-pulse"
+            style={{ background: 'rgba(46,134,222,0.2)', border: '1px solid rgba(46,134,222,0.5)', color: '#74B9FF' }}>
+            ⚡ Steal available
           </span>
         )}
+        {phase === 'team2-answering' && (
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase"
+            style={{ background: 'rgba(46,134,222,0.25)', border: '1px solid rgba(46,134,222,0.6)', color: '#74B9FF' }}>
+            ⚡ Steal attempt
+          </span>
+        )}
+
         <span className="ml-auto text-xs text-[#9BA8C4]">Q {qIdx} / {qTotal}</span>
       </div>
 
-      {/* Timer bar — shown for all modes while active */}
-      {timeLeft > 0 && (
+      {/* Timer bar — hidden during steal-offered (no countdown running) */}
+      {showTimerBar && (
         <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
           <div
             className="h-full rounded-full timer-bar"
@@ -80,7 +90,7 @@ export function QuestionPanel({
         {question.question}
       </p>
 
-      {/* Answer */}
+      {/* Answer section */}
       {answerRevealed ? (
         <div className="animate-slide-up">
           <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-1.5">Answer</div>
@@ -90,16 +100,15 @@ export function QuestionPanel({
           >
             {question.answer}
           </div>
-          {/* Structured detail: True/False indicator */}
+
+          {/* True/False detail */}
           {question.trueFalseFields && (
             <div className="mt-2 flex items-center gap-2">
               <span
                 className="px-3 py-1 rounded font-display text-base tracking-wide"
-                style={
-                  question.trueFalseFields.isTrue
-                    ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' }
-                    : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }
-                }
+                style={question.trueFalseFields.isTrue
+                  ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' }
+                  : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }}
               >
                 {question.trueFalseFields.isTrue ? 'TRUE' : 'FALSE'}
               </span>
@@ -108,6 +117,7 @@ export function QuestionPanel({
               )}
             </div>
           )}
+
           {/* Open verse detail */}
           {question.openVerseFields && (
             <div className="mt-2 text-xs text-[#9BA8C4]">
