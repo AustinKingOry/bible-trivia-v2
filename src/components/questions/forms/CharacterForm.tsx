@@ -10,7 +10,7 @@ interface Props {
 
 export function CharacterForm({ value, onChange }: Props) {
   // Auto-format question from clues
-  const clueText = value.question.replace(/^I .+\. Who am I\?$/s, '').trim()
+  const clueText = value.question.replace(/^I [\s\S]+\. Who am I\?$/, '').trim()
     || value.question.replace('Who am I?', '').trim()
 
   const updateClues = (clues: string) => {
