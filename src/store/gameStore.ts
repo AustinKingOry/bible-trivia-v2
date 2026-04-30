@@ -226,21 +226,22 @@ export const useGameStore = create<GameStore>()(
         if (result === 'correct') {
           const a = makeActivity(round.currentTeamTurnId, cs.pointsCorrect, 'correct')
           newActivities[a.id] = a
-          if (cat.turnMode === 'per-question-rotation') nextTeamId = getNextTeamId(teams, round.currentTeamTurnId)
+          // Turn advances in nextQuestion — do not advance here
         } else if (result === 'wrong') {
           if (cs.pointsWrong !== 0) { const a = makeActivity(round.currentTeamTurnId, cs.pointsWrong, 'wrong'); newActivities[a.id] = a }
-          if (cat.turnMode === 'per-question-rotation') nextTeamId = getNextTeamId(teams, round.currentTeamTurnId)
+          // Turn advances in nextQuestion — do not advance here
           lockQuestion = false
         } else if (result === 'pass') {
-          if (cat.turnMode === 'per-question-rotation') nextTeamId = getNextTeamId(teams, round.currentTeamTurnId)
+          // Turn advances in nextQuestion — do not advance here
           lockQuestion = false
         } else if (result === 'steal' && stealTeamId) {
           const a = makeActivity(stealTeamId, cs.stealPoints, 'steal'); newActivities[a.id] = a
+          // Turn advances in nextQuestion — do not advance here
         }
 
         set({
           activities: newActivities,
-          rounds: { ...rounds, [roundId]: markDirty({ ...round, currentTeamTurnId: nextTeamId }) },
+          rounds: { ...rounds, [roundId]: markDirty({ ...round }) },
           ...(lockQuestion ? { questionDone: true, answerRevealed: true } : {}),
         })
       },
@@ -248,17 +249,26 @@ export const useGameStore = create<GameStore>()(
       nextQuestion: (roundId) => {
         const { rounds, getCategorySettings } = get()
         const round = rounds[roundId]; if (!round) return
-        const _teams = get().getSessionTeams(round.sessionId)
-        if (_teams.length === 0) { console.warn('startRound: no teams in session'); return }
+        const teams = get().getSessionTeams(round.sessionId)
+        if (teams.length === 0) { console.warn('nextQuestion: no teams in session'); return }
         const nextIdx = round.questionIndex + 1
         if (nextIdx >= round.questionQueue.length) { get().endRound(roundId); return }
         const cat = CATEGORIES.find((c) => c.id === round.categoryId)
         const cs = getCategorySettings(round.categoryId)
-        // For per-question categories, reset answer timer for each question
         const isHotSeat = cat?.turnMode === 'continuous'
         const turnExpiry = isHotSeat ? round.turnExpiresAt : now() + cs.answerTimeSecs * 1000
+        // Always advance turn to next team when moving to next question
+        const nextTeamId = cat?.turnMode === 'per-question-rotation' && round.currentTeamTurnId
+          ? getNextTeamId(teams, round.currentTeamTurnId)
+          : round.currentTeamTurnId
         set((s) => ({
-          rounds: { ...s.rounds, [roundId]: markDirty({ ...round, questionIndex: nextIdx, turnStartedAt: now(), turnExpiresAt: turnExpiry }) },
+          rounds: { ...s.rounds, [roundId]: markDirty({
+            ...round,
+            questionIndex: nextIdx,
+            currentTeamTurnId: nextTeamId,
+            turnStartedAt: now(),
+            turnExpiresAt: turnExpiry,
+          }) },
           answerRevealed: false, questionDone: false,
         }))
       },

@@ -43,6 +43,8 @@ export default function GamePage({
   const [timeLeft, setTimeLeft] = useState<number>(0)
   // Which team is currently in the steal seat (set when admin picks a team)
   const [stealingTeamId, setStealingTeamId] = useState<string | null>(null)
+  // Lock in the original answering team at question start — never changes mid-question
+  const answeringTeamIdRef = useRef<string | null>(round?.currentTeamTurnId ?? null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const stopTimer = useCallback(() => {
@@ -68,6 +70,8 @@ export default function GamePage({
   useEffect(() => {
     if (!round || round.status !== 'active') return
     setStealingTeamId(null)
+    // Capture the answering team at question start — used for steal offer UI
+    answeringTeamIdRef.current = round.currentTeamTurnId
 
     if (isHotSeat) {
       setPhase('team1-answering')
@@ -222,7 +226,7 @@ export default function GamePage({
 
   const qIdx = round.questionIndex + 1
   const qTotal = round.questionQueue.length
-  const otherTeams = teams.filter((t) => t.id !== round.currentTeamTurnId)
+  const otherTeams = teams.filter((t) => t.id !== answeringTeamIdRef.current)
   const stealingTeam = teams.find((t) => t.id === stealingTeamId)
   const isDone = phase === 'done' || questionDone
 
