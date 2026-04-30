@@ -158,19 +158,6 @@ The architecture is explicitly designed for:
 
 TO DO
 1. Add sounds
-2. Finish creating the forms
 3. Create the pdf upload
 4. Implement backend (AI extraction and database integration)
 
-
-
-1. Admin should determine how many points should be awarded for different question types (not hardcoded in the system). So in the questions panel, there should be a settings button to make the adjustments on score, along with description of question type (could include rules), and adjust the countdown time. Countdown time rules:
-a. All question types apart from 'hot seat' should have a limited amount of time per question, which the team has to answer the question. If they don't answer within that duration, their opponents can steal the points
-b. The team with a chance to steal points has a different (shorter) amount of time to answer the question.
-c. Hot seat questions time countdown is not per question, rather as many questions as possible within a timeframe.
-Admin should be able to adjust all these durations.
-2. Allow the question upload interface to support pasting json formats. Useful as an alternative for when the user has a pdf file and they upload it to an LLM like chatpgt or claude. This also means that the tab should provide the user with a ready prompt to give instructions and specify the structure of the json object. The system then uses the objects in the pasted json to create a formatted preview of all questions, for the admin to aprove and click upload.
-3. A team can steal but only get half of total score (e.g in verse completion, team 1 can quote the verse but fail to identify it). Solution; add a 'steal half' button
-
-
-- The system should not allow a round to begin if there's not at least 1 team
