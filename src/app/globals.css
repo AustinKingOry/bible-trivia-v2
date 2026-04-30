@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Bebas Neue', Impact, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: #0A1628;
+  color: #F0EDD8;
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+::-webkit-scrollbar-thumb { background: rgba(245,200,66,0.3); border-radius: 2px; }
+
+/* Utilities */
+.font-display { font-family: var(--font-display); }
+
+.text-gold-glow {
+  color: #F5C842;
+  text-shadow: 0 0 28px rgba(245,200,66,0.45);
+}
+
+/* Panels */
+.panel {
+  background: #142240;
+  border: 1px solid rgba(245,200,66,0.18);
+  border-radius: 12px;
+  padding: 18px;
+}
+.panel-gold {
+  background: #142240;
+  border: 2px solid #F5C842;
+  border-radius: 12px;
+  padding: 20px;
+}
+.panel-sm {
+  background: #142240;
+  border: 1px solid rgba(245,200,66,0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+/* Timer bar */
+.timer-bar { transition: width 1s linear, background-color 0.5s ease; }
+
+/* Status pills */
+.pill-pending  { background: rgba(155,168,196,0.15); color: #9BA8C4; border: 1px solid rgba(155,168,196,0.3); }
+.pill-active   { background: rgba(26,138,74,0.15);   color: #6DFFAA; border: 1px solid rgba(26,138,74,0.4);  }
+.pill-completed{ background: rgba(245,200,66,0.12);  color: #F5C842; border: 1px solid rgba(245,200,66,0.35); }
+
+/* Keyframes */
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes turnPulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.2; }
+}
+@keyframes toastIn {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.animate-slide-up  { animation: slideUp  0.22s ease-out forwards; }
+.animate-fade-in   { animation: fadeIn   0.2s  ease-out forwards; }
+.animate-turn-pulse{ animation: turnPulse 1.2s ease-in-out infinite; }
+.animate-toast-in  { animation: toastIn  0.28s ease-out forwards; }
