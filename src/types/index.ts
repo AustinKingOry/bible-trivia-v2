@@ -16,12 +16,36 @@ export type RoundStatus   = 'pending' | 'active' | 'completed'
 export type SessionStatus = 'setup' | 'active' | 'ended'
 export type QuestionSource= 'seed' | 'manual' | 'ai'
 
-/** Timer phase for per-question categories:
- *  answering   → active team has answerTimeSecs
- *  steal-window → opponent(s) have stealTimeSecs  (only when allowSteal && answer expired)
- *  done        → question resolved, waiting for Next
+/**
+ * Per-question phase state machine (non-hotseat categories):
+ *
+ *  team1-answering  → Active team has answerTimeSecs to respond
+ *       │ CORRECT        → done (award pointsCorrect to team1)
+ *       │ WRONG          → steal-offered (deduct from team1 if applicable)
+ *       │ PASS           → steal-offered (no deduction)
+ *       │ timer expires  → steal-offered (auto, answer revealed)
+ *       ▼
+ *  steal-offered    → Steal button lit up; admin picks which opponent steals
+ *       │ admin clicks STEAL (picks team2) → team2-answering (stealTimeSecs)
+ *       │ NEXT (no steal taken)            → done
+ *       ▼
+ *  team2-answering  → Opponent has stealTimeSecs; NO pass, NO further steal
+ *       │ CORRECT   → done (award stealPoints to team2)
+ *       │ WRONG     → done (no points; optional deduct off team2)
+ *       │ timer expires → done
+ *       ▼
+ *  done             → Question resolved, admin clicks Next Question
+ *
+ * Hot seat uses none of this — it runs a single session countdown.
  */
-export type TimerPhase = 'answering' | 'steal-window' | 'done'
+export type QuestionPhase =
+  | 'team1-answering'
+  | 'steal-offered'
+  | 'team2-answering'
+  | 'done'
+
+/** @deprecated use QuestionPhase */
+export type TimerPhase = QuestionPhase
 
 // ─── Per-category admin-configurable settings ─────────────────────────────────
 export interface CategorySettings {
