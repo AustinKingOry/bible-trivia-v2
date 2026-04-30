@@ -19,9 +19,10 @@ export function Field({ label, hint, required, children }: FieldProps) {
   )
 }
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
   value: string
-  onChange: (v: string) => void
+  onChange: (value: string) => void
 }
 
 export function Input({ value, onChange, ...props }: InputProps) {
@@ -41,10 +42,11 @@ export function Input({ value, onChange, ...props }: InputProps) {
     />
   )
 }
-
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+ 
+interface TextareaProps
+  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange" | "value"> {
   value: string
-  onChange: (v: string) => void
+  onChange: (value: string) => void
 }
 
 export function Textarea({ value, onChange, ...props }: TextareaProps) {
