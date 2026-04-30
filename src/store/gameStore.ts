@@ -41,6 +41,7 @@ interface GameStore extends NormalizedStore {
   nextQuestion: (roundId: string) => void
   revealAnswer: () => void
   resetQuestionState: () => void
+  markQuestionDone: () => void
 
   // ── Questions ─────────────────────────────────────────────────────────────
   addQuestion: (q: Omit<Question, 'id' | 'createdAt' | 'updatedAt' | 'synced'>) => string
@@ -219,6 +220,8 @@ export const useGameStore = create<GameStore>()(
 
         let newActivities = { ...activities }
         let nextTeamId = round.currentTeamTurnId
+        // lockQuestion=false for wrong/pass so the game page can open the steal window first
+        let lockQuestion = true
 
         if (result === 'correct') {
           const a = makeActivity(round.currentTeamTurnId, cs.pointsCorrect, 'correct')
@@ -227,19 +230,18 @@ export const useGameStore = create<GameStore>()(
         } else if (result === 'wrong') {
           if (cs.pointsWrong !== 0) { const a = makeActivity(round.currentTeamTurnId, cs.pointsWrong, 'wrong'); newActivities[a.id] = a }
           if (cat.turnMode === 'per-question-rotation') nextTeamId = getNextTeamId(teams, round.currentTeamTurnId)
+          lockQuestion = false
         } else if (result === 'pass') {
-          if (!sm?.allowPass) return
           if (cat.turnMode === 'per-question-rotation') nextTeamId = getNextTeamId(teams, round.currentTeamTurnId)
+          lockQuestion = false
         } else if (result === 'steal' && stealTeamId) {
-          if (!sm?.allowSteal) return
           const a = makeActivity(stealTeamId, cs.stealPoints, 'steal'); newActivities[a.id] = a
-          nextTeamId = getNextTeamId(teams, round.currentTeamTurnId)
         }
 
         set({
           activities: newActivities,
           rounds: { ...rounds, [roundId]: markDirty({ ...round, currentTeamTurnId: nextTeamId }) },
-          questionDone: true, answerRevealed: true,
+          ...(lockQuestion ? { questionDone: true, answerRevealed: true } : {}),
         })
       },
 
@@ -263,6 +265,7 @@ export const useGameStore = create<GameStore>()(
 
       revealAnswer: () => set({ answerRevealed: true }),
       resetQuestionState: () => set({ answerRevealed: false, questionDone: false }),
+      markQuestionDone: () => set({ questionDone: true }),
 
       // ── Questions ────────────────────────────────────────────────────────
       addQuestion: (q) => {
