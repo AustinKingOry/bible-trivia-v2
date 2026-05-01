@@ -10,6 +10,7 @@ import { ActivityFeed } from '@/components/game/ActivityFeed'
 import { ActionButtons } from '@/components/game/ActionButtons'
 import { QuestionPanel } from '@/components/game/QuestionPanel'
 import { showToast } from '@/components/shared/Toast'
+import { useTones } from '@/hooks/useTones'
 import type { QuestionPhase } from '@/types'
 
 export default function GamePage({
@@ -46,6 +47,7 @@ export default function GamePage({
   // Lock in the original answering team at question start — never changes mid-question
   const answeringTeamIdRef = useRef<string | null>(round?.currentTeamTurnId ?? null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const { play: playTone, stop: stopTone } = useTones()
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
@@ -78,6 +80,7 @@ export default function GamePage({
       const remaining = Math.max(0, Math.round(((round.turnExpiresAt ?? 0) - Date.now()) / 1000))
       startCountdown(remaining, () => {
         setPhase('done')
+        playTone('complete')
         showToast("⏱ HOT SEAT TIME'S UP!", 'wrong')
         endRound(roundId)
       })
@@ -85,6 +88,7 @@ export default function GamePage({
       setPhase('team1-answering')
       startCountdown(cs.answerTimeSecs, () => {
         // Timer ran out for team1 — treat as a pass, open steal
+        playTone('timeout')
         setPhase('steal-offered')
         revealAnswer()
         showToast('⏱ Time up — opponents may steal', 'pass')
@@ -106,6 +110,7 @@ export default function GamePage({
   const handleCorrect = () => {
     stopTimer()
     setPhase('done')
+    playTone('correct')
     processAnswer(roundId, 'correct')
     showToast(`✓ CORRECT! +${cs.pointsCorrect} pts`, 'correct')
   }
@@ -116,10 +121,12 @@ export default function GamePage({
     processAnswer(roundId, 'wrong')  // store: logs deduction, lockQuestion=false
     const msg = cs.pointsWrong !== 0 ? `✗ WRONG! ${cs.pointsWrong} pts` : '✗ WRONG — no deduction'
     if (sm?.allowSteal) {
+      playTone('wrong')
       setPhase('steal-offered')
       revealAnswer()
       showToast(msg + ' — opponents may steal', 'wrong')
     } else {
+      playTone('wrong')
       setPhase('done')
       showToast(msg, 'wrong')
     }
@@ -130,10 +137,12 @@ export default function GamePage({
     stopTimer()
     processAnswer(roundId, 'pass')  // store: advances turn, lockQuestion=false
     if (sm?.allowSteal) {
+      playTone('pass')
       setPhase('steal-offered')
       revealAnswer()
       showToast('→ PASSED — opponents may steal', 'pass')
     } else {
+      playTone('pass')
       setPhase('done')
       showToast('→ PASSED', 'pass')
     }
@@ -146,6 +155,7 @@ export default function GamePage({
     const stealTeam = teams.find((t) => t.id === teamId)
     showToast(`⚡ ${stealTeam?.name} stealing — ${cs.stealTimeSecs}s`, 'steal')
     startCountdown(cs.stealTimeSecs, () => {
+      playTone('timeout')
       setPhase('done')
       markQuestionDone()
       showToast('⏱ Steal time up — no steal scored', 'info')
@@ -158,6 +168,7 @@ export default function GamePage({
     stopTimer()
     setPhase('done')
     const stealTeam = teams.find((t) => t.id === stealingTeamId)
+    playTone('correct')
     processAnswer(roundId, 'steal', stealingTeamId)  // store: logs steal points, lockQuestion=true
     showToast(`⚡ STEAL! ${stealTeam?.name} +${cs.stealPoints} pts`, 'steal')
   }
@@ -166,6 +177,7 @@ export default function GamePage({
   const handleStealWrong = () => {
     stopTimer()
     setPhase('done')
+    playTone('wrong')
     markQuestionDone()
     showToast('✗ Steal missed — no points', 'wrong')
   }
@@ -182,6 +194,8 @@ export default function GamePage({
   const handleEndRound = () => {
     if (confirm('End this round and return to the session dashboard?')) {
       stopTimer()
+      stopTone()
+      playTone('complete')
       endRound(roundId)
       router.push(`/session/${sessionId}`)
     }
