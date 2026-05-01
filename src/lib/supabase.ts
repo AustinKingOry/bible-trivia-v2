@@ -90,15 +90,53 @@ export interface Database {
 
 // ─── Client instances ─────────────────────────────────────────────────────────
 
-const url  = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+function getUrl()  { return process.env.NEXT_PUBLIC_SUPABASE_URL  ?? '' }
+function getAnon() { return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '' }
 
-/** Browser-safe client (uses anon key) */
-export const supabase = createClient<Database>(url, anon)
+function isConfigured() {
+  const url = getUrl()
+  return !!url && url.startsWith('http') && !url.includes('your-project-ref')
+}
+
+/** Lazy singleton — created on first call, only when env vars are present */
+let _browserClient: ReturnType<typeof createClient<Database>> | null = null
+
+export function getSupabaseClient() {
+  if (!isConfigured()) return null
+  if (!_browserClient) {
+    _browserClient = createClient<Database>(getUrl(), getAnon())
+  }
+  return _browserClient
+}
+
+/** Convenience: same as getSupabaseClient() but throws if not configured */
+export function requireSupabaseClient() {
+  const client = getSupabaseClient()
+  if (!client) throw new Error('Supabase is not configured. Add keys to .env.local.')
+  return client
+}
+
+/**
+ * @deprecated Use getSupabaseClient() instead.
+ * Kept for gradual migration — returns null if not configured instead of crashing.
+ */
+export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>>, {
+  get(_target, prop) {
+    const client = getSupabaseClient()
+    if (!client) {
+      // Return a no-op that resolves to an error result so callers degrade gracefully
+      return () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
+    }
+    const value = (client as any)[prop]
+    return typeof value === 'function' ? value.bind(client) : value
+  },
+})
 
 /** Server-side client (uses service role key — never import in client components) */
 export function createServerClient() {
+  const url        = getUrl()
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !url.startsWith('http')) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set')
   if (!serviceKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
   return createClient<Database>(url, serviceKey, {
     auth: { persistSession: false },
