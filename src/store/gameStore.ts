@@ -230,12 +230,15 @@ export const useGameStore = create<GameStore>()(
         if (result === 'correct') {
           const a = makeActivity(round.currentTeamTurnId, cs.pointsCorrect, 'correct')
           newActivities[a.id] = a
+          const correctTone = "/tones/correct.wav";
           // Turn advances in nextQuestion — do not advance here
         } else if (result === 'wrong') {
           if (cs.pointsWrong !== 0) { const a = makeActivity(round.currentTeamTurnId, cs.pointsWrong, 'wrong'); newActivities[a.id] = a }
+          const wrongTone = "/tones/wrong.m4a";
           // Turn advances in nextQuestion — do not advance here
           lockQuestion = false
         } else if (result === 'pass') {
+          const passTone = "/tones/pass.wav";
           // Turn advances in nextQuestion — do not advance here
           lockQuestion = false
         } else if (result === 'steal' && stealTeamId) {
