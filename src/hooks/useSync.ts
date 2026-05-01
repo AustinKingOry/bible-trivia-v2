@@ -94,7 +94,7 @@ export function useSync(): UseSyncReturn {
     syncNow()
     const timer = setInterval(syncNow, SYNC_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [syncNow])
+  }, [])
 
   return { status, lastSyncedAt, dirtyCount, syncNow, isConfigured: SUPABASE_CONFIGURED }
 }
