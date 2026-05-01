@@ -50,6 +50,10 @@ interface GameStore extends NormalizedStore {
   getAllQuestions: () => Question[]
   getQuestionsByCategory: (categoryId: string) => Question[]
 
+  // ── Sync ──────────────────────────────────────────────────────────────────
+  markSynced: (ids: { questions?: string[]; sessions?: string[]; teams?: string[]; rounds?: string[]; activities?: string[] }) => void
+  mergePulledQuestions: (questions: Question[]) => void
+
   // ── Selectors ─────────────────────────────────────────────────────────────
   getSessionTeams: (sessionId: string) => Team[]
   getSessionRounds: (sessionId: string) => Round[]
@@ -293,6 +297,40 @@ export const useGameStore = create<GameStore>()(
         set((s) => { const cq = { ...s.customQuestions }; delete cq[id]; return { customQuestions: cq } }),
       getAllQuestions: () => [...SEED_QUESTIONS, ...Object.values(get().customQuestions)],
       getQuestionsByCategory: (categoryId) => get().getAllQuestions().filter((q) => q.categoryId === categoryId),
+
+      // ── Sync ─────────────────────────────────────────────────────────────
+      markSynced: ({ questions = [], sessions = [], teams = [], rounds = [], activities = [] }) =>
+        set((s) => {
+          const patch = <T extends { synced?: boolean }>(
+            record: Record<string, T>, ids: string[]
+          ): Record<string, T> => {
+            if (!ids.length) return record
+            const next = { ...record }
+            ids.forEach((id) => { if (next[id]) next[id] = { ...next[id], synced: true } })
+            return next
+          }
+          return {
+            customQuestions: patch(s.customQuestions, questions),
+            sessions:        patch(s.sessions,        sessions),
+            teams:           patch(s.teams,            teams),
+            rounds:          patch(s.rounds,           rounds),
+            activities:      patch(s.activities,       activities),
+          }
+        }),
+
+      mergePulledQuestions: (pulled) =>
+        set((s) => {
+          const next = { ...s.customQuestions }
+          pulled.forEach((q) => {
+            // Only import non-seed questions; don't overwrite newer local edits
+            if (q.source === 'seed') return
+            const existing = next[q.id]
+            if (!existing || q.updatedAt > existing.updatedAt) {
+              next[q.id] = { ...q, synced: true }
+            }
+          })
+          return { customQuestions: next }
+        }),
 
       // ── Selectors ────────────────────────────────────────────────────────
       getSessionTeams: (sessionId) =>
