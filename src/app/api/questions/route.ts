@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     const { error } = await supabase
       .from('questions')
-      .upsert(rows, { onConflict: 'id' })
+      .upsert(rows as any, { onConflict: 'id' })
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -74,7 +74,7 @@ export async function DELETE(request: Request) {
     const supabase = createServerClient()
     const { error } = await supabase
       .from('questions')
-      .update({ deleted_at: Date.now() })
+      .update({ deleted_at: Date.now() } as never)
       .eq('id', id)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
