@@ -31,7 +31,7 @@ export interface SyncResult {
 async function pushQuestions(dirty: Question[]): Promise<{ synced: string[]; error?: string }> {
   if (!dirty.length) return { synced: [] }
   const rows = dirty.map(questionToDb)
-  const { error } = await supabase.from('questions').upsert(rows, { onConflict: 'id' })
+  const { error } = await supabase.from('questions').upsert(rows as any, { onConflict: 'id' })
   if (error) return { synced: [], error: error.message }
   return { synced: dirty.map((q) => q.id) }
 }
@@ -39,7 +39,7 @@ async function pushQuestions(dirty: Question[]): Promise<{ synced: string[]; err
 async function pushSessions(dirty: Session[]): Promise<{ synced: string[]; error?: string }> {
   if (!dirty.length) return { synced: [] }
   const rows = dirty.map(sessionToDb)
-  const { error } = await supabase.from('sessions').upsert(rows, { onConflict: 'id' })
+  const { error } = await supabase.from('sessions').upsert(rows as any, { onConflict: 'id' })
   if (error) return { synced: [], error: error.message }
   return { synced: dirty.map((s) => s.id) }
 }
@@ -47,7 +47,7 @@ async function pushSessions(dirty: Session[]): Promise<{ synced: string[]; error
 async function pushTeams(dirty: Team[]): Promise<{ synced: string[]; error?: string }> {
   if (!dirty.length) return { synced: [] }
   const rows = dirty.map(teamToDb)
-  const { error } = await supabase.from('teams').upsert(rows, { onConflict: 'id' })
+  const { error } = await supabase.from('teams').upsert(rows as any, { onConflict: 'id' })
   if (error) return { synced: [], error: error.message }
   return { synced: dirty.map((t) => t.id) }
 }
@@ -55,7 +55,7 @@ async function pushTeams(dirty: Team[]): Promise<{ synced: string[]; error?: str
 async function pushRounds(dirty: Round[]): Promise<{ synced: string[]; error?: string }> {
   if (!dirty.length) return { synced: [] }
   const rows = dirty.map(roundToDb)
-  const { error } = await supabase.from('rounds').upsert(rows, { onConflict: 'id' })
+  const { error } = await supabase.from('rounds').upsert(rows as any, { onConflict: 'id' })
   if (error) return { synced: [], error: error.message }
   return { synced: dirty.map((r) => r.id) }
 }
@@ -63,7 +63,7 @@ async function pushRounds(dirty: Round[]): Promise<{ synced: string[]; error?: s
 async function pushActivities(dirty: Activity[]): Promise<{ synced: string[]; error?: string }> {
   if (!dirty.length) return { synced: [] }
   const rows = dirty.map(activityToDb)
-  const { error } = await supabase.from('activities').upsert(rows, { onConflict: 'id' })
+  const { error } = await supabase.from('activities').upsert(rows as any, { onConflict: 'id' })
   if (error) return { synced: [], error: error.message }
   return { synced: dirty.map((a) => a.id) }
 }
@@ -148,14 +148,14 @@ export async function runSync(payload: SyncPayload): Promise<InternalSyncResult>
 export async function pushSingleQuestion(q: Question): Promise<{ ok: boolean; error?: string }> {
   const { error } = await supabase
     .from('questions')
-    .upsert(questionToDb(q), { onConflict: 'id' })
+    .upsert(questionToDb(q) as any, { onConflict: 'id' })
   return { ok: !error, error: error?.message }
 }
 
 export async function deleteSingleQuestion(id: string): Promise<{ ok: boolean; error?: string }> {
   const { error } = await supabase
     .from('questions')
-    .update({ deleted_at: Date.now() })
+    .update({ deleted_at: Date.now() } as never)
     .eq('id', id)
   return { ok: !error, error: error?.message }
 }
