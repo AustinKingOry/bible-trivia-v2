@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { SyncIndicator } from '@/components/layout/SyncIndicator'
 import { usePathname } from 'next/navigation'
 import { useGameStore } from '@/store/gameStore'
 
@@ -86,9 +87,12 @@ export function Sidebar() {
         </div>
       )}
 
+      {/* Sync status */}
+      <SyncIndicator />
+
       {/* Version */}
-      <div className="px-2 py-3 hidden lg:block">
-        <div className="text-[9px] text-[#4A5568] text-center tracking-widest">v2.0 · offline-first</div>
+      <div className="px-2 py-2 hidden lg:block">
+        <div className="text-[9px] text-[#4A5568] text-center tracking-widest">v3.0 · offline-first + sync</div>
       </div>
     </aside>
   )
