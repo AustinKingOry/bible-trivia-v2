@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
+import { pushSingleQuestion, deleteSingleQuestion } from '@/lib/sync'
 import type { Category, Question } from '@/types'
 
 interface Props {
@@ -17,7 +19,22 @@ const DIFF_STYLE: Record<string, { color: string; bg: string; border: string }> 
 }
 
 export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
-  const { deleteQuestion } = useGameStore()
+  const { deleteQuestion, updateQuestion } = useGameStore()
+  const [syncingId, setSyncingId] = useState<string | null>(null)
+
+  const handleSyncQuestion = async (q: any) => {
+    setSyncingId(q.id)
+    const { ok, error } = await pushSingleQuestion(q)
+    if (ok) updateQuestion(q.id, { synced: true })
+    else console.error('Sync failed:', error)
+    setSyncingId(null)
+  }
+
+  const handleDeleteQuestion = async (q: any) => {
+    if (!confirm('Delete this question?')) return
+    deleteQuestion(q.id)
+    if (q.synced) await deleteSingleQuestion(q.id)
+  }
 
   if (questions.length === 0) {
     return (
@@ -117,6 +134,21 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                 )}
                 {isCustom && (
                   <>
+                    {/* Sync status dot */}
+                    {q.synced === false && (
+                      <button
+                        onClick={() => handleSyncQuestion(q)}
+                        disabled={syncingId === q.id}
+                        className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded transition-all disabled:opacity-50"
+                        style={{ background: 'rgba(245,200,66,0.15)', color: '#F5C842', border: '1px solid rgba(245,200,66,0.3)' }}
+                        title="Not synced — click to push"
+                      >
+                        {syncingId === q.id ? '…' : '↑'}
+                      </button>
+                    )}
+                    {q.synced === true && (
+                      <span className="text-[9px] text-[#6DFFAA]" title="Synced">✓</span>
+                    )}
                     <button
                       onClick={() => onEdit(q)}
                       className="text-[#9BA8C4] hover:text-[#F5C842] text-xs font-semibold transition-colors px-2 py-1 rounded"
@@ -125,9 +157,7 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                       Edit
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm('Delete this question?')) deleteQuestion(q.id)
-                      }}
+                      onClick={() => handleDeleteQuestion(q)}
                       className="text-[#9BA8C4] hover:text-red-400 text-lg transition-colors leading-none px-1"
                     >
                       ×
