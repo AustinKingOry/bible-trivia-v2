@@ -21,6 +21,7 @@ export interface DbQuestion {
   source_ref: string | null
   created_at: number
   updated_at: number
+  user_id: string | null
   deleted_at: number | null
 }
 
@@ -29,6 +30,7 @@ export interface DbSession {
   name: string
   status: string
   active_round_id: string | null
+  user_id: string | null
   created_at: number
   updated_at: number
   deleted_at: number | null
@@ -40,6 +42,7 @@ export interface DbTeam {
   name: string
   color: string
   players: string[]
+  user_id: string | null
   created_at: number
   updated_at: number
   deleted_at: number | null
@@ -58,6 +61,7 @@ export interface DbRound {
   current_team_turn_id: string | null
   turn_started_at: number | null
   turn_expires_at: number | null
+  user_id: string | null
   created_at: number
   updated_at: number
   deleted_at: number | null
@@ -71,6 +75,7 @@ export interface DbActivity {
   question_id: string
   points: number
   reason: string
+  user_id: string | null
   created_at: number
   updated_at: number
   deleted_at: number | null
@@ -83,9 +88,27 @@ export interface Database {
       sessions:   { Row: DbSession;   Insert: DbSession;   Update: Partial<DbSession>   }
       teams:      { Row: DbTeam;      Insert: DbTeam;      Update: Partial<DbTeam>      }
       rounds:     { Row: DbRound;     Insert: DbRound;     Update: Partial<DbRound>     }
-      activities: { Row: DbActivity;  Insert: DbActivity;  Update: Partial<DbActivity>  }
+      activities: { Row: DbActivity; Insert: DbActivity;Update: Partial<DbActivity>}
+      category_settings:   { Row: DbCategorySettings; Insert: DbCategorySettings; Update: Partial<DbCategorySettings> }
     }
   }
+}
+
+
+
+export interface DbCategorySettings {
+  id: string
+  user_id: string
+  category_id: string
+  points_correct: number
+  points_wrong: number
+  steal_points: number
+  answer_time_secs: number
+  steal_time_secs: number
+  hot_seat_time_secs: number
+  created_at: number
+  updated_at: number
+  deleted_at: number | null
 }
 
 // ─── Client instances ─────────────────────────────────────────────────────────
@@ -117,20 +140,13 @@ export function requireSupabaseClient() {
 }
 
 /**
- * @deprecated Use getSupabaseClient() instead.
- * Kept for gradual migration — returns null if not configured instead of crashing.
+ * Direct supabase client — use getSupabaseClient() which returns null when not configured.
+ * This alias calls getSupabaseClient() lazily; safe to import anywhere.
+ * Will return null (not throw) if Supabase env vars are missing.
  */
-export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>>, {
-  get(_target, prop) {
-    const client = getSupabaseClient()
-    if (!client) {
-      // Return a no-op that resolves to an error result so callers degrade gracefully
-      return () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
-    }
-    const value = (client as any)[prop]
-    return typeof value === 'function' ? value.bind(client) : value
-  },
-})
+export function getSupabase() {
+  return getSupabaseClient()
+}
 
 /** Server-side client (uses service role key — never import in client components) */
 export function createServerClient() {
@@ -164,10 +180,11 @@ export function dbToQuestion(row: DbQuestion): Question {
     updatedAt:     row.updated_at,
     deletedAt:     row.deleted_at      ?? undefined,
     synced:        true,
+    userId:        row.user_id ?? undefined,
   }
 }
 
-export function questionToDb(q: Question): DbQuestion {
+export function questionToDb(q: Question, userId?: string): DbQuestion {
   return {
     id:               q.id,
     category_id:      q.categoryId,
@@ -185,6 +202,7 @@ export function questionToDb(q: Question): DbQuestion {
     created_at:       q.createdAt,
     updated_at:       q.updatedAt,
     deleted_at:       q.deletedAt   ?? null,
+    user_id:          userId ?? null,
   }
 }
 
@@ -198,10 +216,11 @@ export function dbToSession(row: DbSession): Session {
     updatedAt:     row.updated_at,
     deletedAt:     row.deleted_at ?? undefined,
     synced:        true,
+    userId:        row.user_id ?? undefined,
   }
 }
 
-export function sessionToDb(s: Session): DbSession {
+export function sessionToDb(s: Session, userId?: string): DbSession {
   return {
     id:              s.id,
     name:            s.name,
@@ -210,6 +229,7 @@ export function sessionToDb(s: Session): DbSession {
     created_at:      s.createdAt,
     updated_at:      s.updatedAt,
     deleted_at:      s.deletedAt ?? null,
+    user_id:         userId ?? null,
   }
 }
 
@@ -224,10 +244,11 @@ export function dbToTeam(row: DbTeam): Team {
     updatedAt: row.updated_at,
     deletedAt: row.deleted_at ?? undefined,
     synced:    true,
+    userId:    row.user_id ?? undefined,
   }
 }
 
-export function teamToDb(t: Team): DbTeam {
+export function teamToDb(t: Team, userId?: string): DbTeam {
   return {
     id:         t.id,
     session_id: t.sessionId,
@@ -237,6 +258,7 @@ export function teamToDb(t: Team): DbTeam {
     created_at: t.createdAt,
     updated_at: t.updatedAt,
     deleted_at: t.deletedAt ?? null,
+    user_id:    userId ?? null,
   }
 }
 
@@ -258,10 +280,11 @@ export function dbToRound(row: DbRound): Round {
     updatedAt:          row.updated_at,
     deletedAt:          row.deleted_at ?? undefined,
     synced:             true,
+    userId:             row.user_id ?? undefined,
   }
 }
 
-export function roundToDb(r: Round): DbRound {
+export function roundToDb(r: Round, userId?: string): DbRound {
   return {
     id:                   r.id,
     session_id:           r.sessionId,
@@ -278,6 +301,7 @@ export function roundToDb(r: Round): DbRound {
     created_at:           r.createdAt,
     updated_at:           r.updatedAt,
     deleted_at:           r.deletedAt ?? null,
+    user_id:              userId ?? null,
   }
 }
 
@@ -294,10 +318,11 @@ export function dbToActivity(row: DbActivity): Activity {
     updatedAt:   row.updated_at,
     deletedAt:   row.deleted_at ?? undefined,
     synced:      true,
+    userId:      row.user_id ?? undefined,
   }
 }
 
-export function activityToDb(a: Activity): DbActivity {
+export function activityToDb(a: Activity, userId?: string): DbActivity {
   return {
     id:          a.id,
     session_id:  a.sessionId,
@@ -309,5 +334,40 @@ export function activityToDb(a: Activity): DbActivity {
     created_at:  a.createdAt,
     updated_at:  a.updatedAt,
     deleted_at:  a.deletedAt ?? null,
+    user_id:     userId ?? null,
+  }
+}
+
+export function dbToCategorySettings(row: DbCategorySettings): import('@/types').CategorySettings {
+  return {
+    id:               row.id,
+    categoryId:       row.category_id,
+    userId:           row.user_id,
+    pointsCorrect:    row.points_correct,
+    pointsWrong:      row.points_wrong,
+    stealPoints:      row.steal_points,
+    answerTimeSecs:   row.answer_time_secs,
+    stealTimeSecs:    row.steal_time_secs,
+    hotSeatTimeSecs:  row.hot_seat_time_secs,
+    createdAt:        row.created_at,
+    updatedAt:        row.updated_at,
+    synced:           true,
+  }
+}
+
+export function categorySettingsToDb(cs: import('@/types').CategorySettings, userId: string): DbCategorySettings {
+  return {
+    id:                  cs.id,
+    user_id:             userId,
+    category_id:         cs.categoryId,
+    points_correct:      cs.pointsCorrect,
+    points_wrong:        cs.pointsWrong,
+    steal_points:        cs.stealPoints,
+    answer_time_secs:    cs.answerTimeSecs,
+    steal_time_secs:     cs.stealTimeSecs,
+    hot_seat_time_secs:  cs.hotSeatTimeSecs,
+    created_at:          cs.createdAt,
+    updated_at:          cs.updatedAt,
+    deleted_at:          null,
   }
 }
