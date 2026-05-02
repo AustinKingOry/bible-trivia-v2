@@ -176,7 +176,7 @@ export async function pushSingleQuestion(
     const client = getClient()
     const { error } = await client
       .from('questions')
-      .upsert(questionToDb(q, userId), { onConflict: 'id' } as any)
+      .upsert(questionToDb(q, userId) as never, { onConflict: 'id' } as any)
     return { ok: !error, error: error?.message }
   } catch (e) {
     return { ok: false, error: (e as Error).message }
@@ -190,7 +190,7 @@ export async function deleteSingleQuestion(
     const client = getClient()
     const { error } = await client
       .from('questions')
-      .update({ deleted_at: Date.now() } as any)
+      .update({ deleted_at: Date.now() } as never)
       .eq('id', id)
     return { ok: !error, error: error?.message }
   } catch (e) {

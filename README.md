@@ -157,7 +157,7 @@ The architecture is explicitly designed for:
 
 
 TO DO
-1. Add sounds
 3. Create the pdf upload
 4. Implement backend (AI extraction and database integration)
+3. Add questions categorization. Remove restrictions on the nature of questions; from bible only to something open to multiple areas. So users can choose the category/nature of questions like bible, nature, technology, science and any other as the user uploads.
 
