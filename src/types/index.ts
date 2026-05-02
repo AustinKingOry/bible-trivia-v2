@@ -1,6 +1,7 @@
 // ─── Sync-ready base ─────────────────────────────────────────────────────────
 export interface SyncBase {
   id: string
+  userId?: string           // auth.uid() — undefined for anonymous/local-only records
   createdAt: number
   updatedAt: number
   synced?: boolean
@@ -49,7 +50,9 @@ export type TimerPhase = QuestionPhase
 
 // ─── Per-category admin-configurable settings ─────────────────────────────────
 export interface CategorySettings {
+  id: string                // uid — needed for DB upsert
   categoryId: string
+  userId?: string           // auth.uid()
 
   // Scoring
   pointsCorrect: number
@@ -62,6 +65,11 @@ export interface CategorySettings {
 
   // Hot Seat only
   hotSeatTimeSecs: number  // total session duration for the hot-seat round
+
+  // Sync
+  createdAt: number
+  updatedAt: number
+  synced?: boolean
 }
 
 // ─── Category-specific question fields ───────────────────────────────────────
