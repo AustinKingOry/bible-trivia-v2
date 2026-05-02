@@ -1,165 +1,199 @@
 /**
- * sync.ts — Offline-first sync engine
+ * sync.ts — Offline-first sync engine (browser-only)
  *
- * Strategy:
- *   PUSH: find records with synced=false in the local store, upsert to Supabase,
- *         then mark them synced=true locally.
- *   PULL: fetch all questions from Supabase that are newer than our last pull,
- *         merge into customQuestions store.
- *
- * Only questions are pull-synced (shared across devices).
- * Sessions/teams/rounds/activities are push-only (per-device game data).
+ * Never import in Server Components or API routes.
+ * All Supabase calls go through getSupabaseClient() which is lazy and null-safe.
  */
 
-import { supabase, questionToDb, dbToQuestion, sessionToDb, teamToDb, roundToDb, activityToDb } from './supabase'
-import type { Question, Session, Team, Round, Activity } from '@/types'
+import {
+  getSupabaseClient,
+  questionToDb, dbToQuestion,
+  sessionToDb, teamToDb, roundToDb, activityToDb,
+  categorySettingsToDb, dbToCategorySettings,
+} from './supabase'
+import type { Question, Session, Team, Round, Activity, CategorySettings } from '@/types'
 
 export type SyncStatus = 'idle' | 'syncing' | 'error' | 'ok'
 
 export interface SyncResult {
-  pushedQuestions: number
-  pushedSessions:  number
-  pushedTeams:     number
-  pushedRounds:    number
-  pushedActivities: number
-  pulledQuestions: number
-  errors: string[]
+  pushedQuestions:        number
+  pushedSessions:         number
+  pushedTeams:            number
+  pushedRounds:           number
+  pushedActivities:       number
+  pushedCategorySettings: number
+  pulledQuestions:        number
+  pulledCategorySettings: number
+  errors:                 string[]
 }
 
-// ─── PUSH ─────────────────────────────────────────────────────────────────────
-
-async function pushQuestions(dirty: Question[]): Promise<{ synced: string[]; error?: string }> {
-  if (!dirty.length) return { synced: [] }
-  const rows = dirty.map(questionToDb)
-  const { error } = await supabase.from('questions').upsert(rows as any, { onConflict: 'id' })
-  if (error) return { synced: [], error: error.message }
-  return { synced: dirty.map((q) => q.id) }
+interface PulledData {
+  questions:        Question[]
+  categorySettings: CategorySettings[]
 }
 
-async function pushSessions(dirty: Session[]): Promise<{ synced: string[]; error?: string }> {
-  if (!dirty.length) return { synced: [] }
-  const rows = dirty.map(sessionToDb)
-  const { error } = await supabase.from('sessions').upsert(rows as any, { onConflict: 'id' })
-  if (error) return { synced: [], error: error.message }
-  return { synced: dirty.map((s) => s.id) }
+interface InternalSyncResult extends SyncResult {
+  _pulled: PulledData
 }
 
-async function pushTeams(dirty: Team[]): Promise<{ synced: string[]; error?: string }> {
-  if (!dirty.length) return { synced: [] }
-  const rows = dirty.map(teamToDb)
-  const { error } = await supabase.from('teams').upsert(rows as any, { onConflict: 'id' })
-  if (error) return { synced: [], error: error.message }
-  return { synced: dirty.map((t) => t.id) }
+// ─── Lazy client guard ────────────────────────────────────────────────────────
+
+function getClient() {
+  const client = getSupabaseClient()
+  if (!client) throw new Error('Supabase not configured')
+  return client
 }
 
-async function pushRounds(dirty: Round[]): Promise<{ synced: string[]; error?: string }> {
-  if (!dirty.length) return { synced: [] }
-  const rows = dirty.map(roundToDb)
-  const { error } = await supabase.from('rounds').upsert(rows as any, { onConflict: 'id' })
-  if (error) return { synced: [], error: error.message }
-  return { synced: dirty.map((r) => r.id) }
-}
+// ─── Generic push ─────────────────────────────────────────────────────────────
 
-async function pushActivities(dirty: Activity[]): Promise<{ synced: string[]; error?: string }> {
-  if (!dirty.length) return { synced: [] }
-  const rows = dirty.map(activityToDb)
-  const { error } = await supabase.from('activities').upsert(rows as any, { onConflict: 'id' })
-  if (error) return { synced: [], error: error.message }
-  return { synced: dirty.map((a) => a.id) }
+async function pushRows(table: string, rows: unknown[]): Promise<string | undefined> {
+  if (!rows.length) return undefined
+  const client = getClient()
+  const { error } = await (client.from as any)(table).upsert(rows, { onConflict: 'id' })
+  return error?.message
 }
 
 // ─── PULL ─────────────────────────────────────────────────────────────────────
 
-/**
- * Pull all non-deleted custom questions (source != 'seed') from Supabase.
- * Returns Question[] ready to merge into the store's customQuestions.
- */
-export async function pullQuestions(since?: number): Promise<{ questions: Question[]; error?: string }> {
-  let query = supabase
-    .from('questions')
-    .select('*')
-    .is('deleted_at', null)
-    .neq('source', 'seed')
-    .order('created_at', { ascending: true })
+export async function pullQuestions(
+  userId: string, since?: number
+): Promise<{ questions: Question[]; error?: string }> {
+  try {
+    const client = getClient()
+    let query = client
+      .from('questions')
+      .select('*')
+      .is('deleted_at', null)
+      .neq('source', 'seed')
+      .order('created_at', { ascending: true })
 
-  if (since) {
-    query = query.gt('updated_at', since)
+    // Pull own questions + any public questions (user_id null = shared)
+    if (since) query = (query as any).gt('updated_at', since)
+
+    const { data, error } = await query
+    if (error) return { questions: [], error: error.message }
+    return { questions: (data ?? []).map(dbToQuestion) }
+  } catch {
+    return { questions: [] }
   }
+}
 
-  const { data, error } = await query
-  if (error) return { questions: [], error: error.message }
-  return { questions: (data ?? []).map(dbToQuestion) }
+export async function pullCategorySettings(
+  userId: string, since?: number
+): Promise<{ categorySettings: CategorySettings[]; error?: string }> {
+  try {
+    const client = getClient()
+    let query = (client.from as any)('category_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true })
+
+    if (since) query = query.gt('updated_at', since)
+
+    const { data, error } = await query
+    if (error) return { categorySettings: [], error: error.message }
+    return { categorySettings: (data ?? []).map(dbToCategorySettings) }
+  } catch {
+    return { categorySettings: [] }
+  }
 }
 
 // ─── MAIN SYNC ────────────────────────────────────────────────────────────────
 
 export interface SyncPayload {
-  dirtyQuestions:  Question[]
-  dirtySessions:   Session[]
-  dirtyTeams:      Team[]
-  dirtyRounds:     Round[]
-  dirtyActivities: Activity[]
-  lastPulledAt?:   number
+  userId:                 string
+  dirtyQuestions:         Question[]
+  dirtySessions:          Session[]
+  dirtyTeams:             Team[]
+  dirtyRounds:            Round[]
+  dirtyActivities:        Activity[]
+  dirtyCategorySettings:  CategorySettings[]
+  lastPulledAt?:          number
 }
 
-interface InternalSyncResult extends SyncResult { _pulled: Question[] }
-
 export async function runSync(payload: SyncPayload): Promise<InternalSyncResult> {
+  const { userId } = payload
   const result: SyncResult = {
     pushedQuestions: 0, pushedSessions: 0, pushedTeams: 0,
-    pushedRounds: 0, pushedActivities: 0, pulledQuestions: 0,
+    pushedRounds: 0, pushedActivities: 0, pushedCategorySettings: 0,
+    pulledQuestions: 0, pulledCategorySettings: 0,
     errors: [],
   }
 
-  // ── PUSH (parallel) ────────────────────────────────────────────────────────
-  const [qRes, sRes, tRes, rRes, aRes] = await Promise.all([
-    pushQuestions(payload.dirtyQuestions),
-    pushSessions(payload.dirtySessions),
-    pushTeams(payload.dirtyTeams),
-    pushRounds(payload.dirtyRounds),
-    pushActivities(payload.dirtyActivities),
+  // ── PUSH all dirty records (parallel) ─────────────────────────────────────
+  const [qErr, sErr, tErr, rErr, aErr, csErr] = await Promise.all([
+    pushRows('questions',        payload.dirtyQuestions.map((q)  => questionToDb(q, userId))),
+    pushRows('sessions',         payload.dirtySessions.map((s)   => sessionToDb(s, userId))),
+    pushRows('teams',            payload.dirtyTeams.map((t)      => teamToDb(t, userId))),
+    pushRows('rounds',           payload.dirtyRounds.map((r)     => roundToDb(r, userId))),
+    pushRows('activities',       payload.dirtyActivities.map((a) => activityToDb(a, userId))),
+    pushRows('category_settings', payload.dirtyCategorySettings.map((cs) => categorySettingsToDb(cs, userId))),
   ])
 
-  if (qRes.error) result.errors.push(`Questions: ${qRes.error}`)
-  else result.pushedQuestions = qRes.synced.length
+  if (qErr)  result.errors.push(`Questions: ${qErr}`)
+  else result.pushedQuestions = payload.dirtyQuestions.length
 
-  if (sRes.error) result.errors.push(`Sessions: ${sRes.error}`)
-  else result.pushedSessions = sRes.synced.length
+  if (sErr)  result.errors.push(`Sessions: ${sErr}`)
+  else result.pushedSessions = payload.dirtySessions.length
 
-  if (tRes.error) result.errors.push(`Teams: ${tRes.error}`)
-  else result.pushedTeams = tRes.synced.length
+  if (tErr)  result.errors.push(`Teams: ${tErr}`)
+  else result.pushedTeams = payload.dirtyTeams.length
 
-  if (rRes.error) result.errors.push(`Rounds: ${rRes.error}`)
-  else result.pushedRounds = rRes.synced.length
+  if (rErr)  result.errors.push(`Rounds: ${rErr}`)
+  else result.pushedRounds = payload.dirtyRounds.length
 
-  if (aRes.error) result.errors.push(`Activities: ${aRes.error}`)
-  else result.pushedActivities = aRes.synced.length
+  if (aErr)  result.errors.push(`Activities: ${aErr}`)
+  else result.pushedActivities = payload.dirtyActivities.length
 
-  // ── PULL questions ─────────────────────────────────────────────────────────
-  const { questions: pulled, error: pullErr } = await pullQuestions(payload.lastPulledAt)
-  if (pullErr) result.errors.push(`Pull: ${pullErr}`)
-  else result.pulledQuestions = pulled.length
+  if (csErr) result.errors.push(`CategorySettings: ${csErr}`)
+  else result.pushedCategorySettings = payload.dirtyCategorySettings.length
 
-  return { ...result, _pulled: pulled }
+  // ── PULL (parallel) ────────────────────────────────────────────────────────
+  const [
+    { questions: pulledQ,  error: pullQErr },
+    { categorySettings: pulledCS, error: pullCSErr },
+  ] = await Promise.all([
+    pullQuestions(userId, payload.lastPulledAt),
+    pullCategorySettings(userId, payload.lastPulledAt),
+  ])
+
+  if (pullQErr)  result.errors.push(`Pull questions: ${pullQErr}`)
+  else result.pulledQuestions = pulledQ.length
+
+  if (pullCSErr) result.errors.push(`Pull category settings: ${pullCSErr}`)
+  else result.pulledCategorySettings = pulledCS.length
+
+  return { ...result, _pulled: { questions: pulledQ, categorySettings: pulledCS } }
 }
 
-// ─── QUESTION-ONLY HELPERS (for Questions page sync button) ───────────────────
+// ─── Per-question helpers ─────────────────────────────────────────────────────
 
-export async function pushSingleQuestion(q: Question): Promise<{ ok: boolean; error?: string }> {
-  const { error } = await supabase
-    .from('questions')
-    .upsert(questionToDb(q) as any, { onConflict: 'id' })
-  return { ok: !error, error: error?.message }
+export async function pushSingleQuestion(
+  q: Question, userId: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const client = getClient()
+    const { error } = await client
+      .from('questions')
+      .upsert(questionToDb(q, userId), { onConflict: 'id' } as any)
+    return { ok: !error, error: error?.message }
+  } catch (e) {
+    return { ok: false, error: (e as Error).message }
+  }
 }
 
-export async function deleteSingleQuestion(id: string): Promise<{ ok: boolean; error?: string }> {
-  const { error } = await supabase
-    .from('questions')
-    .update({ deleted_at: Date.now() } as never)
-    .eq('id', id)
-  return { ok: !error, error: error?.message }
-}
-
-export async function fetchAllRemoteQuestions(): Promise<{ questions: Question[]; error?: string }> {
-  return pullQuestions()
+export async function deleteSingleQuestion(
+  id: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const client = getClient()
+    const { error } = await client
+      .from('questions')
+      .update({ deleted_at: Date.now() } as any)
+      .eq('id', id)
+    return { ok: !error, error: error?.message }
+  } catch (e) {
+    return { ok: false, error: (e as Error).message }
+  }
 }
