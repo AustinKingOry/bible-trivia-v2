@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
 import { pushSingleQuestion, deleteSingleQuestion } from '@/lib/sync'
+import { useAuth } from '@/hooks/useAuth'
 import type { Category, Question } from '@/types'
 
 interface Props {
@@ -20,11 +21,13 @@ const DIFF_STYLE: Record<string, { color: string; bg: string; border: string }> 
 
 export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
   const { deleteQuestion, updateQuestion } = useGameStore()
+  const { user } = useAuth()
   const [syncingId, setSyncingId] = useState<string | null>(null)
 
   const handleSyncQuestion = async (q: any) => {
+    if (!user) return
     setSyncingId(q.id)
-    const { ok, error } = await pushSingleQuestion(q)
+    const { ok, error } = await pushSingleQuestion(q, user.id)
     if (ok) updateQuestion(q.id, { synced: true })
     else console.error('Sync failed:', error)
     setSyncingId(null)
@@ -134,8 +137,8 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                 )}
                 {isCustom && (
                   <>
-                    {/* Sync status dot */}
-                    {q.synced === false && (
+                    {/* Sync status dot — only shown when logged in */}
+                    {q.synced === false && user && (
                       <button
                         onClick={() => handleSyncQuestion(q)}
                         disabled={syncingId === q.id}
@@ -145,6 +148,9 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                       >
                         {syncingId === q.id ? '…' : '↑'}
                       </button>
+                    )}
+                    {q.synced === false && !user && (
+                      <span className="text-[9px] text-[#4A5568]" title="Sign in to sync">⚬</span>
                     )}
                     {q.synced === true && (
                       <span className="text-[9px] text-[#6DFFAA]" title="Synced">✓</span>
