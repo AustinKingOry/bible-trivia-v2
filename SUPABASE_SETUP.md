@@ -146,3 +146,42 @@ If you want to add authentication later:
 
 **Questions not appearing on another device**
 → Only custom questions (source: `manual` or `ai`) are synced. Seed questions live in `data.ts`. Trigger a manual sync on both devices.
+
+---
+
+## Authentication Setup (Migration 002)
+
+After running the initial schema, run the auth migration:
+
+1. Go to **SQL Editor** in your Supabase dashboard
+2. Paste and run `supabase/migrations/002_add_auth.sql`
+
+This adds:
+- `user_id` column to all tables
+- `category_settings` table (scoring/timing preferences per user)
+- Per-user Row Level Security policies (each user sees only their own data)
+- Questions remain publicly readable (shared question bank)
+
+### Enable Email Auth
+
+In your Supabase dashboard:
+1. Go to **Authentication → Providers**
+2. Ensure **Email** is enabled (it is by default)
+3. Optionally enable **Magic Links** (passwordless sign-in)
+4. Under **Authentication → Email Templates**, customise the confirmation email if desired
+
+### What Syncs When Logged In
+
+| Data | Syncs |
+|---|---|
+| Custom questions | ✅ Push + pull |
+| Sessions | ✅ Push |
+| Teams | ✅ Push |
+| Rounds | ✅ Push |
+| Activities (scores) | ✅ Push |
+| Category settings (scoring/timing) | ✅ Push + pull |
+| Seed questions | ❌ Bundled only |
+
+### What Happens When Logged Out
+
+All data is saved locally in `localStorage` as always. Nothing is sent to the database. The sync indicator shows a **"Sign In / Register"** button. Clicking it opens the auth modal.
