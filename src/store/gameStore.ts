@@ -51,8 +51,9 @@ interface GameStore extends NormalizedStore {
   getQuestionsByCategory: (categoryId: string) => Question[]
 
   // ── Sync ──────────────────────────────────────────────────────────────────
-  markSynced: (ids: { questions?: string[]; sessions?: string[]; teams?: string[]; rounds?: string[]; activities?: string[] }) => void
+  markSynced: (ids: { questions?: string[]; sessions?: string[]; teams?: string[]; rounds?: string[]; activities?: string[]; categorySettings?: string[] }) => void
   mergePulledQuestions: (questions: Question[]) => void
+  mergePulledCategorySettings: (settings: CategorySettings[]) => void
 
   // ── Selectors ─────────────────────────────────────────────────────────────
   getSessionTeams: (sessionId: string) => Team[]
@@ -85,12 +86,18 @@ export const useGameStore = create<GameStore>()(
       },
 
       updateCategorySettings: (categoryId, patch) =>
-        set((s) => ({
-          categorySettings: {
-            ...s.categorySettings,
-            [categoryId]: { ...s.categorySettings[categoryId] ?? DEFAULT_CATEGORY_SETTINGS[categoryId], ...patch },
-          },
-        })),
+        set((s) => {
+          const existing = s.categorySettings[categoryId] ?? DEFAULT_CATEGORY_SETTINGS[categoryId]
+          const updated = {
+            ...existing,
+            ...patch,
+            updatedAt: now(),
+            synced: false,
+          }
+          return {
+            categorySettings: { ...s.categorySettings, [categoryId]: updated },
+          }
+        }),
 
       resetCategorySettings: (categoryId) =>
         set((s) => ({
@@ -299,7 +306,7 @@ export const useGameStore = create<GameStore>()(
       getQuestionsByCategory: (categoryId) => get().getAllQuestions().filter((q) => q.categoryId === categoryId),
 
       // ── Sync ─────────────────────────────────────────────────────────────
-      markSynced: ({ questions = [], sessions = [], teams = [], rounds = [], activities = [] }) =>
+      markSynced: ({ questions = [], sessions = [], teams = [], rounds = [], activities = [], categorySettings = [] }) =>
         set((s) => {
           const patch = <T extends { synced?: boolean }>(
             record: Record<string, T>, ids: string[]
@@ -309,12 +316,23 @@ export const useGameStore = create<GameStore>()(
             ids.forEach((id) => { if (next[id]) next[id] = { ...next[id], synced: true } })
             return next
           }
+          // categorySettings is keyed by categoryId, but ids are the cs.id values
+          // so we need to scan by matching cs.id
+          const patchCsByDbId = (record: Record<string, any>, ids: string[]) => {
+            if (!ids.length) return record
+            const next = { ...record }
+            Object.keys(next).forEach((catId) => {
+              if (ids.includes(next[catId].id)) next[catId] = { ...next[catId], synced: true }
+            })
+            return next
+          }
           return {
-            customQuestions: patch(s.customQuestions, questions),
-            sessions:        patch(s.sessions,        sessions),
-            teams:           patch(s.teams,            teams),
-            rounds:          patch(s.rounds,           rounds),
-            activities:      patch(s.activities,       activities),
+            customQuestions:  patch(s.customQuestions, questions),
+            sessions:         patch(s.sessions,        sessions),
+            teams:            patch(s.teams,            teams),
+            rounds:           patch(s.rounds,           rounds),
+            activities:       patch(s.activities,       activities),
+            categorySettings: patchCsByDbId(s.categorySettings, categorySettings),
           }
         }),
 
@@ -330,6 +348,19 @@ export const useGameStore = create<GameStore>()(
             }
           })
           return { customQuestions: next }
+        }),
+
+      mergePulledCategorySettings: (pulled) =>
+        set((s) => {
+          const next = { ...s.categorySettings }
+          pulled.forEach((cs) => {
+            const existing = next[cs.categoryId]
+            // Remote wins if newer than local
+            if (!existing || cs.updatedAt > (existing.updatedAt ?? 0)) {
+              next[cs.categoryId] = { ...cs, synced: true }
+            }
+          })
+          return { categorySettings: next }
         }),
 
       // ── Selectors ────────────────────────────────────────────────────────
