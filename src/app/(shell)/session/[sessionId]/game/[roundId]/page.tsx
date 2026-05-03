@@ -23,6 +23,7 @@ export default function GamePage({
 
   const round = useGameStore((s) => s.rounds[roundId])
   const teams = useGameStore((s) => s.getSessionTeams(sessionId))
+  const allTopics = useGameStore((s) => s.getAllTopics())
   const answerRevealed = useGameStore((s) => s.answerRevealed)
   const questionDone = useGameStore((s) => s.questionDone)
   const {
@@ -240,6 +241,9 @@ export default function GamePage({
 
   const qIdx = round.questionIndex + 1
   const qTotal = round.questionQueue.length
+  const topicLabel = round.topicTag
+    ? (allTopics.find((t) => t.tag === round.topicTag) ?? { emoji: '🏷️', label: round.topicTag })
+    : undefined
   const otherTeams = teams.filter((t) => t.id !== answeringTeamIdRef.current)
   const stealingTeam = teams.find((t) => t.id === stealingTeamId)
   const isDone = phase === 'done' || questionDone
@@ -257,8 +261,19 @@ export default function GamePage({
         className="border-b px-4 py-2.5 flex items-center gap-3 flex-shrink-0"
         style={{ borderColor: 'rgba(245,200,66,0.25)', background: 'linear-gradient(135deg,#142240,#1E3360)' }}
       >
-        <Link href={`/session/${sessionId}`} className="text-[#9BA8C4] hover:text-[#F5C842] text-base transition-colors">←</Link>
-        <div className="font-display text-lg tracking-widest text-gold-glow flex-1 truncate">{round.name}</div>
+        <Link href={`/session/${sessionId}`} className="text-[#9BA8C4] hover:text-[#9c8950] text-base transition-colors">←</Link>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="font-display text-lg tracking-widest text-gold-glow truncate">{round.name}</div>
+          {round.topicTag && (() => {
+            const t = allTopics.find((x) => x.tag === round.topicTag) ?? { emoji: '🏷️', label: round.topicTag }
+            return (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
+                style={{ background: 'rgba(123,47,190,0.2)', border: '1px solid rgba(123,47,190,0.4)', color: '#C084FC' }}>
+                {t.emoji} {t.label}
+              </span>
+            )
+          })()}
+        </div>
         {phaseBadge && (
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide animate-pulse"
             style={{ background: phaseBadge.bg, border: `1px solid ${phaseBadge.border}`, color: phaseBadge.color }}>
@@ -291,6 +306,8 @@ export default function GamePage({
                 timerColor={timerColor}
                 timeLeft={timeLeft}
                 phase={phase}
+                topicTag={round.topicTag}
+                topicLabel={topicLabel}
               />
 
               {/* Current team / steal indicator */}
