@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
-import { CATEGORIES } from '@/lib/data'
+import { CATEGORIES, ALL_TOPICS_TAG } from '@/lib/data'
 import type { Difficulty } from '@/types'
 
 const DIFFS: { id: Difficulty; label: string; color: string }[] = [
@@ -15,24 +15,35 @@ const DIFFS: { id: Difficulty; label: string; color: string }[] = [
 interface Props { sessionId: string; onClose: () => void }
 
 export function AddRoundModal({ sessionId, onClose }: Props) {
-  const { createRound, getAvailableQuestionCount, getSessionRounds } = useGameStore()
+  const { createRound, getAvailableQuestionCount, getSessionRounds, getAllTopics } = useGameStore()
   const existingRounds = getSessionRounds(sessionId)
+  const allTopics = getAllTopics()
 
   const [categoryId, setCategoryId] = useState<string>(CATEGORIES[0].id)
-  const [difficulty, setDifficulty] = useState<Difficulty>('all')
+  const [difficulty, setDifficulty]   = useState<Difficulty>('all')
+  const [topicTag, setTopicTag]       = useState<string>(ALL_TOPICS_TAG)
   const [questionLimit, setQuestionLimit] = useState('')
   const [name, setName] = useState('')
 
-  const available = getAvailableQuestionCount(categoryId, difficulty)
+  const available = getAvailableQuestionCount(categoryId, difficulty, topicTag)
   const cat = CATEGORIES.find((c) => c.id === categoryId)!
 
-  const diffLabel = DIFFS.find((d) => d.id === difficulty)?.label ?? 'All'
-  const defaultName = `Round ${existingRounds.length + 1} — ${cat.name}`
+  const topicLabel = topicTag === ALL_TOPICS_TAG
+    ? 'All topics'
+    : allTopics.find((t) => t.tag === topicTag)?.label ?? topicTag
+
+  const defaultName = `Round ${existingRounds.length + 1} — ${cat.name}${topicTag !== ALL_TOPICS_TAG ? ` (${topicLabel})` : ''}`
 
   const handleCreate = () => {
     const roundName = name.trim() || defaultName
     const limit = questionLimit ? parseInt(questionLimit) : undefined
-    createRound(sessionId, { name: roundName, categoryId, difficulty, questionLimit: limit })
+    createRound(sessionId, {
+      name: roundName,
+      categoryId,
+      topicTag: topicTag === ALL_TOPICS_TAG ? undefined : topicTag,
+      difficulty,
+      questionLimit: limit,
+    })
     onClose()
   }
 
@@ -42,7 +53,10 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
       style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="panel w-full max-w-md animate-slide-up" style={{ border: '1.5px solid rgba(245,200,66,0.35)' }}>
+      <div
+        className="panel w-full max-w-lg animate-slide-up overflow-y-auto"
+        style={{ border: '1.5px solid rgba(245,200,66,0.35)', maxHeight: '90vh' }}
+      >
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display text-2xl tracking-widest text-[#F5C842]">ADD ROUND</h2>
           <button onClick={onClose} className="text-[#9BA8C4] hover:text-white text-2xl transition-colors">×</button>
@@ -69,9 +83,9 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
           />
         </label>
 
-        {/* Category */}
+        {/* Question format */}
         <div className="mb-4">
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Category</div>
+          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Question Format</div>
           <div className="grid grid-cols-2 gap-2">
             {CATEGORIES.map((c) => (
               <button
@@ -88,6 +102,45 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Topic / Subject filter */}
+        <div className="mb-4">
+          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">
+            Subject / Topic
+            <span className="ml-2 text-[#4A5568] normal-case font-normal">optional filter</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {/* All topics option */}
+            <button
+              onClick={() => setTopicTag(ALL_TOPICS_TAG)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+              style={topicTag === ALL_TOPICS_TAG
+                ? { background: 'rgba(245,200,66,0.15)', border: '1.5px solid #F5C842', color: '#F5C842' }
+                : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent', color: '#9BA8C4' }
+              }
+            >
+              🌐 All topics
+            </button>
+            {allTopics.map((t) => (
+              <button
+                key={t.tag}
+                onClick={() => setTopicTag(t.tag)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+                style={topicTag === t.tag
+                  ? { background: 'rgba(123,47,190,0.2)', border: '1.5px solid #7B2FBE', color: '#C084FC' }
+                  : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent', color: '#9BA8C4' }
+                }
+              >
+                <span>{t.emoji}</span> {t.label}
+              </button>
+            ))}
+          </div>
+          {topicTag !== ALL_TOPICS_TAG && (
+            <p className="text-[10px] text-[#9BA8C4] mt-1.5">
+              Only <span className="text-[#C084FC] font-semibold">{topicLabel}</span> questions will be used in this round.
+            </p>
+          )}
         </div>
 
         {/* Difficulty */}
@@ -115,7 +168,8 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
           </div>
           <p className="text-[10px] text-[#9BA8C4] mt-1.5">
             {available} question{available !== 1 ? 's' : ''} available
-            {difficulty === 'all' && ' across all difficulties'}
+            {difficulty === 'all' ? ' across all difficulties' : ''}
+            {topicTag !== ALL_TOPICS_TAG ? ` · ${topicLabel} only` : ''}
           </p>
         </div>
 
@@ -153,7 +207,10 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
           CREATE ROUND
         </button>
         {available === 0 && (
-          <p className="text-center text-xs text-red-400 mt-2">No questions for this selection.</p>
+          <p className="text-center text-xs text-red-400 mt-2">
+            No questions for this selection.
+            {topicTag !== ALL_TOPICS_TAG && ' Try "All topics" or add questions with this topic.'}
+          </p>
         )}
       </div>
     </div>
