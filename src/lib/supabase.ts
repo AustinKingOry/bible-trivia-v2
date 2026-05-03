@@ -13,6 +13,7 @@ export interface DbQuestion {
   answer: string
   source: string
   tags: string[] | null
+  topic_tag: string | null
   quote_fields: Record<string, unknown> | null
   open_verse_fields: Record<string, unknown> | null
   true_false_fields: Record<string, unknown> | null
@@ -58,6 +59,7 @@ export interface DbRound {
   question_limit: number | null
   question_queue: string[]
   question_index: number
+  topic_tag: string | null
   current_team_turn_id: string | null
   turn_started_at: number | null
   turn_expires_at: number | null
@@ -88,13 +90,11 @@ export interface Database {
       sessions:   { Row: DbSession;   Insert: DbSession;   Update: Partial<DbSession>   }
       teams:      { Row: DbTeam;      Insert: DbTeam;      Update: Partial<DbTeam>      }
       rounds:     { Row: DbRound;     Insert: DbRound;     Update: Partial<DbRound>     }
-      activities: { Row: DbActivity; Insert: DbActivity;Update: Partial<DbActivity>}
+      activities:          { Row: DbActivity;         Insert: DbActivity;         Update: Partial<DbActivity>         }
       category_settings:   { Row: DbCategorySettings; Insert: DbCategorySettings; Update: Partial<DbCategorySettings> }
     }
   }
 }
-
-
 
 export interface DbCategorySettings {
   id: string
@@ -179,6 +179,7 @@ export function dbToQuestion(row: DbQuestion): Question {
     createdAt:     row.created_at,
     updatedAt:     row.updated_at,
     deletedAt:     row.deleted_at      ?? undefined,
+    topicTag:      row.topic_tag ?? undefined,
     synced:        true,
     userId:        row.user_id ?? undefined,
   }
@@ -197,6 +198,7 @@ export function questionToDb(q: Question, userId?: string): DbQuestion {
     open_verse_fields: q.openVerseFields ? { ...q.openVerseFields } : null,
     true_false_fields: q.trueFalseFields ? { ...q.trueFalseFields } : null,
     hot_seat_fields:  q.hotSeatFields   ? { ...q.hotSeatFields }   : null,
+    topic_tag:        q.topicTag    ?? null,
     ai_generated:     q.aiGenerated ?? null,
     source_ref:       q.sourceRef   ?? null,
     created_at:       q.createdAt,
@@ -273,6 +275,7 @@ export function dbToRound(row: DbRound): Round {
     questionLimit:      row.question_limit ?? undefined,
     questionQueue:      row.question_queue,
     questionIndex:      row.question_index,
+    topicTag:           row.topic_tag ?? undefined,
     currentTeamTurnId:  row.current_team_turn_id,
     turnStartedAt:      row.turn_started_at,
     turnExpiresAt:      row.turn_expires_at,
@@ -295,6 +298,7 @@ export function roundToDb(r: Round, userId?: string): DbRound {
     question_limit:       r.questionLimit ?? null,
     question_queue:       r.questionQueue,
     question_index:       r.questionIndex,
+    topic_tag:            r.topicTag ?? null,
     current_team_turn_id: r.currentTeamTurnId,
     turn_started_at:      r.turnStartedAt,
     turn_expires_at:      r.turnExpiresAt,
