@@ -19,6 +19,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const rounds = useGameStore((s) => s.getSessionRounds(sessionId))
   const teamCount = useGameStore((s) => s.getSessionTeams(sessionId).length)
   const { startRound, endRound, deleteRound } = useGameStore()
+  const allTopics = useGameStore((s) => s.getAllTopics())
+  const getTopicLabel = (tag?: string) => {
+    if (!tag) return null
+    return allTopics.find((t) => t.tag === tag) ?? { tag, label: tag, emoji: '🏷️' }
+  }
 
   const [showAddRound, setShowAddRound] = useState(false)
   const [showTeams, setShowTeams] = useState(false)
@@ -184,6 +189,14 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                       <span className={`capitalize font-semibold ${diffColor[round.difficulty]}`}>
                         {round.difficulty === 'all' ? '⭐ All difficulties' : round.difficulty}
                       </span>
+                      {round.topicTag && (() => {
+                        const t = getTopicLabel(round.topicTag)
+                        return t ? (
+                          <span className="font-semibold" style={{ color: '#C084FC' }}>
+                            {t.emoji} {t.label}
+                          </span>
+                        ) : null
+                      })()}
                       {round.questionLimit && <span>Limit: {round.questionLimit}q</span>}
                       {round.status !== 'pending' && (
                         <span>Q {round.questionIndex + 1}/{round.questionQueue.length}</span>
