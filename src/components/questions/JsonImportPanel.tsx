@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 import { useGameStore } from '@/store/gameStore'
 import { CATEGORIES } from '@/lib/data'
 import type { Difficulty, Question } from '@/types'
@@ -11,6 +11,7 @@ export interface ImportedQuestion {
   difficulty: 'easy' | 'medium' | 'hard'
   question: string
   answer: string
+  topicTag?: string       // subject matter — e.g. 'bible', 'science', 'nature'
   // optional enrichment
   verseRef?: string          // quote category
   partialVerse?: string      // quote category
@@ -76,6 +77,7 @@ function toStoreQuestion(q: ImportedQuestion): Omit<Question, 'id' | 'createdAt'
     question: q.question.trim(),
     answer: q.answer.trim(),
     source: 'ai' as const,
+    topicTag: q.topicTag?.toLowerCase().trim() || undefined,
   }
 
   if (q.categoryId === 'quote' && (q.verseRef || q.partialVerse)) {
@@ -102,7 +104,8 @@ Each question object must follow this exact schema:
   "categoryId": "general" | "quote" | "character" | "hotseat" | "openverse" | "truefalse",
   "difficulty": "easy" | "medium" | "hard",
   "question": "The question text shown to teams",
-  "answer": "The correct answer"
+  "answer": "The correct answer",
+  "topicTag": "bible" | "science" | "nature" | "technology" | "history" | "geography" | "sport" | "music" | "film" | "literature" | "maths" | "food" | "general" | "any-custom-string"
 }
 
 Category-specific optional fields (include these if the category warrants them):
@@ -130,8 +133,13 @@ For "hotseat":
 For "character":
   No extra fields — write the question as a first-person clue ending with "Who am I?"
 
-Category definitions:
-- general: open Bible knowledge questions
+topicTag is the SUBJECT MATTER — what the question is about:
+- Use 'bible' for biblical / scripture questions
+- Use 'science', 'nature', 'technology', 'history', 'geography', 'sport', 'music', 'film', 'literature', 'maths', 'food' for other subjects
+- Use any lowercase hyphenated string for a custom topic (e.g. 'greek-mythology', 'african-history')
+
+Category definitions (these are the FORMAT, not the subject):
+- general: open knowledge questions
 - quote: complete the missing words of a verse
 - character: first-person clues, teams name the Bible character
 - hotseat: listing challenge (as many X as possible in 30 seconds)
@@ -507,6 +515,12 @@ export function JsonImportPanel() {
                         <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded"
                           style={q.isTrue ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' } : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }}>
                           {q.isTrue ? 'TRUE' : 'FALSE'}
+                        </span>
+                      )}
+                      {q.topicTag && (
+                        <span className="inline-block mt-1 mr-1 px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                          style={{ background: 'rgba(123,47,190,0.15)', border: '1px solid rgba(123,47,190,0.3)', color: '#C084FC' }}>
+                          🏷️ {q.topicTag}
                         </span>
                       )}
                       {q.acceptableAnswers && q.acceptableAnswers.length > 0 && (
