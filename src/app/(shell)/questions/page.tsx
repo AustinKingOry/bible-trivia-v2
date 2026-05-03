@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
-import { CATEGORIES } from '@/lib/data'
+import { CATEGORIES, DEFAULT_CATEGORY_SETTINGS, PREDEFINED_TOPICS, ALL_TOPICS_TAG } from '@/lib/data'
 import { QuestionList } from '@/components/questions/QuestionList'
 import { AddQuestionDrawer } from '@/components/questions/AddQuestionDrawer'
 import { PdfUploadPanel } from '@/components/questions/PdfUploadPanel'
@@ -18,16 +18,19 @@ export default function QuestionsPage() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all')
+  const [filterTopic, setFilterTopic] = useState<string>(ALL_TOPICS_TAG)
 
   const allQuestions = useGameStore((s) => s.getAllQuestions())
   const customQuestions = useGameStore((s) => s.customQuestions)
   const categorySettings = useGameStore((s) => s.categorySettings)
+  const allTopics = useGameStore((s) => s.getAllTopics())
 
   const activeCategory = CATEGORIES.find((c) => c.id === activeCategoryId)!
 
   const categoryQuestions = allQuestions.filter((q) => {
     if (q.categoryId !== activeCategoryId) return false
     if (filterDifficulty !== 'all' && q.difficulty !== filterDifficulty) return false
+    if (filterTopic !== ALL_TOPICS_TAG && q.topicTag !== filterTopic) return false
     return true
   })
 
@@ -36,7 +39,7 @@ export default function QuestionsPage() {
     Object.values(customQuestions).filter((q) => q.categoryId === catId).length
 
   // Count how many categories have modified settings
-  const { DEFAULT_CATEGORY_SETTINGS } = require('@/lib/data')
+  // DEFAULT_CATEGORY_SETTINGS imported at top
   const modifiedSettingsCount = CATEGORIES.filter((cat) => {
     const stored = categorySettings[cat.id]
     const def = DEFAULT_CATEGORY_SETTINGS[cat.id]
@@ -222,6 +225,37 @@ export default function QuestionsPage() {
                   )
                 })}
               </div>
+            </div>
+
+            {/* Topic filter row */}
+            <div
+              className="px-6 py-2 border-b flex items-center gap-2 flex-wrap flex-shrink-0"
+              style={{ borderColor: 'rgba(245,200,66,0.08)' }}
+            >
+              <span className="text-[10px] text-[#9BA8C4] font-semibold uppercase tracking-widest mr-1 flex-shrink-0">Topic:</span>
+              <button
+                onClick={() => setFilterTopic(ALL_TOPICS_TAG)}
+                className="px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all"
+                style={filterTopic === ALL_TOPICS_TAG
+                  ? { background: 'rgba(245,200,66,0.15)', border: '1px solid rgba(245,200,66,0.4)', color: '#F5C842' }
+                  : { background: 'rgba(255,255,255,0.04)', border: '1px solid transparent', color: '#9BA8C4' }
+                }
+              >
+                All topics
+              </button>
+              {allTopics.map((t) => (
+                <button
+                  key={t.tag}
+                  onClick={() => setFilterTopic(t.tag)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all"
+                  style={filterTopic === t.tag
+                    ? { background: 'rgba(123,47,190,0.2)', border: '1px solid rgba(123,47,190,0.5)', color: '#C084FC' }
+                    : { background: 'rgba(255,255,255,0.04)', border: '1px solid transparent', color: '#9BA8C4' }
+                  }
+                >
+                  <span>{t.emoji}</span> {t.label}
+                </button>
+              ))}
             </div>
 
             <QuestionList
