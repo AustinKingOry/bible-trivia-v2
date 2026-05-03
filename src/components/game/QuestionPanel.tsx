@@ -16,12 +16,15 @@ interface Props {
   timerColor: string
   timeLeft: number
   phase: QuestionPhase
+  topicTag?: string
+  topicLabel?: { emoji: string; label: string }
 }
 
 export function QuestionPanel({
   question, cat, difficulty, diffBadge,
   qIdx, qTotal, answerRevealed, onReveal,
   isHotSeat, timerPct, timerColor, timeLeft, phase,
+  topicTag, topicLabel,
 }: Props) {
   if (!question || !cat) {
     return (
@@ -57,6 +60,12 @@ export function QuestionPanel({
         <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase border ${diffBadge[question.difficulty] ?? diffBadge[difficulty] ?? ''}`}>
           {question.difficulty}
         </span>
+        {topicLabel && (
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase"
+            style={{ background: 'rgba(123,47,190,0.15)', border: '1px solid rgba(123,47,190,0.35)', color: '#C084FC' }}>
+            {topicLabel.emoji} {topicLabel.label}
+          </span>
+        )}
 
         {/* Phase badge inside card */}
         {phase === 'steal-offered' && (
