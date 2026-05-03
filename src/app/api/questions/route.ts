@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createServerClient, questionToDb, dbToQuestion } from '@/lib/supabase'
+import {
+  createServerClient,
+  questionToDb,
+  dbToQuestion,
+} from '@/lib/supabase'
 import type { Question } from '@/types'
 
 // ─── Auth helper ──────────────────────────────────────────────────────────────
