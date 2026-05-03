@@ -89,6 +89,15 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                   {q.answer}
                 </p>
 
+                {/* Topic tag */}
+                {q.topicTag && (
+                  <span
+                    className="inline-block mt-1 mr-1.5 px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                    style={{ background: 'rgba(123,47,190,0.15)', border: '1px solid rgba(123,47,190,0.3)', color: '#C084FC' }}
+                  >
+                    {q.topicTag}
+                  </span>
+                )}
                 {/* Category-specific details */}
                 {q.quoteFields && (
                   <p className="text-[10px] text-[#9BA8C4] mt-1">📖 {q.quoteFields.verseRef}</p>
