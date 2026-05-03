@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useGameStore } from '@/store/gameStore'
 import type { Category, Difficulty, Question } from '@/types'
+import { PREDEFINED_TOPICS } from '@/lib/data'
 import { QuoteForm } from './forms/QuoteForm'
 import { GeneralForm } from './forms/GeneralForm'
 import { CharacterForm } from './forms/CharacterForm'
@@ -26,6 +27,7 @@ export interface FormPayload {
   question: string
   answer: string
   difficulty: Difficulty
+  topicTag?: string
   quoteFields?: Question['quoteFields']
   openVerseFields?: Question['openVerseFields']
   trueFalseFields?: Question['trueFalseFields']
@@ -35,11 +37,13 @@ export interface FormPayload {
 export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props) {
   const { addQuestion, updateQuestion } = useGameStore()
   const isEditing = !!editingQuestion
+  const allTopics = useGameStore((s) => s.getAllTopics())
 
   const [difficulty, setDifficulty] = useState<Difficulty>(editingQuestion?.difficulty ?? 'easy')
   const [payload, setPayload] = useState<Omit<FormPayload, 'difficulty'>>({
     question: editingQuestion?.question ?? '',
     answer: editingQuestion?.answer ?? '',
+    topicTag: editingQuestion?.topicTag ?? 'bible',
     quoteFields: editingQuestion?.quoteFields,
     openVerseFields: editingQuestion?.openVerseFields,
     trueFalseFields: editingQuestion?.trueFalseFields,
@@ -135,6 +139,35 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
 
         {/* Category-specific form */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
+          {/* Topic tag picker */}
+          <div className="mb-4">
+            <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Subject / Topic</div>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {allTopics.map((t) => {
+                const active = payload.topicTag === t.tag
+                return (
+                  <button
+                    key={t.tag}
+                    type="button"
+                    onClick={() => setPayload((p) => ({ ...p, topicTag: t.tag }))}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
+                    style={active
+                      ? { background: 'rgba(245,200,66,0.18)', border: '1.5px solid #F5C842', color: '#F5C842' }
+                      : { background: 'rgba(255,255,255,0.05)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }
+                    }
+                  >
+                    <span>{t.emoji}</span> {t.label}
+                  </button>
+                )
+              })}
+            </div>
+            {/* Custom topic input */}
+            <CustomTopicInput
+              current={payload.topicTag}
+              onSelect={(tag) => setPayload((p) => ({ ...p, topicTag: tag }))}
+            />
+          </div>
+
           {/* Hint banner */}
           <div
             className="flex items-start gap-2 px-3 py-2.5 rounded-lg mb-4 text-xs text-[#9BA8C4]"
@@ -174,5 +207,71 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
         </div>
       </div>
     </>
+  )
+}
+
+// ─── Inline custom topic creator ──────────────────────────────────────────────
+function CustomTopicInput({
+  current, onSelect,
+}: { current?: string; onSelect: (tag: string) => void }) {
+  const [value, setValue] = useState('')
+  const [emoji, setEmoji] = useState('🏷️')
+  const { addCustomTopic, getAllTopics } = useGameStore()
+  const allTopics = getAllTopics()
+  const { PREDEFINED_TOPICS } = require('@/lib/data')
+  const predefinedTags = new Set(PREDEFINED_TOPICS.map((p: any) => p.tag))
+
+  const handleAdd = () => {
+    const tag = value.toLowerCase().trim().replace(/\s+/g, '-')
+    if (!tag) return
+    const label = value.trim().charAt(0).toUpperCase() + value.trim().slice(1)
+    addCustomTopic(tag, label, emoji)
+    onSelect(tag)
+    setValue('')
+    setEmoji('🏷️')
+  }
+
+  // Show if something is typed that isn't already a topic
+  const isNewTag = value.trim() &&
+    !allTopics.find((t: any) => t.tag === value.toLowerCase().trim())
+
+  return (
+    <div className="flex gap-2 items-center">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (isNewTag) handleAdd() } }}
+        placeholder="Add custom topic…"
+        maxLength={32}
+        className="flex-1 px-3 py-1.5 rounded-lg text-xs text-[#F0EDD8] outline-none"
+        style={{
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          fontFamily: 'var(--font-body)',
+        }}
+      />
+      {isNewTag && (
+        <>
+          <input
+            type="text"
+            value={emoji}
+            onChange={(e) => setEmoji(e.target.value || '🏷️')}
+            maxLength={4}
+            className="w-10 text-center px-1 py-1.5 rounded-lg text-base outline-none"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+            title="Pick an emoji"
+          />
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={{ background: 'rgba(245,200,66,0.18)', border: '1px solid rgba(245,200,66,0.35)', color: '#F5C842' }}
+          >
+            + Add
+          </button>
+        </>
+      )}
+    </div>
   )
 }
