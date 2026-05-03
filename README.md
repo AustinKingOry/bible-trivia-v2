@@ -159,5 +159,6 @@ The architecture is explicitly designed for:
 TO DO
 3. Create the pdf upload
 4. Implement backend (AI extraction and database integration)
-3. Add questions categorization. Remove restrictions on the nature of questions; from bible only to something open to multiple areas. So users can choose the category/nature of questions like bible, nature, technology, science and any other as the user uploads.
 
+
+Fix: true/false questions' rules are just like any other. Points can be stolen just like other question types.

@@ -39,7 +39,7 @@ export function ActionButtons({
   return (
     <div className="panel flex flex-col gap-3">
       <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase">
-        Record Outcome {currentTeamId}
+        Record Outcome
       </div>
 
       {/* ── PHASE: team1-answering ──────────────────────────────────────── */}
