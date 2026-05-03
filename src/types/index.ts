@@ -18,6 +18,27 @@ export type SessionStatus = 'setup' | 'active' | 'ended'
 export type QuestionSource= 'seed' | 'manual' | 'ai'
 
 /**
+ * QuestionType = the FORMAT / MECHANICS of the question.
+ * Controls which add-form, scoring rules and turn mode apply.
+ * This is what the old "categoryId" was on CATEGORIES in data.ts.
+ */
+export type QuestionType =
+  | 'quote'
+  | 'general'
+  | 'character'
+  | 'hotseat'
+  | 'openverse'
+  | 'truefalse'
+
+/**
+ * TopicTag = the SUBJECT MATTER of the question.
+ * Stored as a free-form string; predefined tags are suggestions only.
+ * Users can create their own tags on-the-fly.
+ * Examples: 'bible', 'science', 'nature', 'technology', 'history', 'sport'
+ */
+export type TopicTag = string
+
+/**
  * Per-question phase state machine (non-hotseat categories):
  *
  *  team1-answering  → Active team has answerTimeSecs to respond
@@ -96,7 +117,8 @@ export interface HotSeatFields {
 
 // ─── Question ─────────────────────────────────────────────────────────────────
 export interface Question extends SyncBase {
-  categoryId: string
+  categoryId: string      // questionType — the format/mechanics (quote, general, etc.)
+  topicTag?: string       // subject matter — free-form (bible, science, nature, etc.)
   difficulty: Difficulty
   question: string
   answer: string
@@ -127,7 +149,8 @@ export interface Team extends SyncBase {
 export interface Round extends SyncBase {
   sessionId: string
   name: string
-  categoryId: string
+  categoryId: string      // questionType used for this round
+  topicTag?: string       // optional subject-matter filter ('bible', 'science', etc.)
   difficulty: Difficulty
   status: RoundStatus
   questionLimit?: number
@@ -155,6 +178,19 @@ export interface NormalizedStore {
   activities:      Record<string, Activity>
   customQuestions: Record<string, Question>
   categorySettings: Record<string, CategorySettings>  // keyed by categoryId
+  /**
+   * User-created topic tags persisted locally.
+   * Predefined tags (bible, science, etc.) are never stored here — they come from PREDEFINED_TOPICS.
+   * Keys are the tag string itself (lowercased, trimmed).
+   */
+  customTopics:    Record<string, CustomTopic>
+}
+
+export interface CustomTopic {
+  tag: string        // e.g. 'mythology'
+  label: string      // e.g. 'Mythology'
+  emoji: string      // e.g. '🏛️'
+  createdAt: number
 }
 
 // ─── Static config (not persisted) ───────────────────────────────────────────
