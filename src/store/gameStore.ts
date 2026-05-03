@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type {
   NormalizedStore, Session, Team, Round, Activity, Question,
-  Difficulty, AnswerResult, SessionStatus, RoundStatus, CategorySettings,
+  Difficulty, AnswerResult, SessionStatus, RoundStatus, CategorySettings, CustomTopic,
 } from '@/types'
 import { CATEGORIES, SCORING_MODES, TEAM_COLORS, SEED_QUESTIONS, DEFAULT_CATEGORY_SETTINGS } from '@/lib/data'
 import { uid, now, deriveLeaderboard, getNextTeamId, markDirty } from '@/lib/engine'
@@ -31,7 +31,7 @@ interface GameStore extends NormalizedStore {
   removePlayer: (teamId: string, player: string) => void
 
   // ── Rounds ────────────────────────────────────────────────────────────────
-  createRound: (sessionId: string, opts: { name: string; categoryId: string; difficulty: Difficulty; questionLimit?: number }) => string
+  createRound: (sessionId: string, opts: { name: string; categoryId: string; topicTag?: string; difficulty: Difficulty; questionLimit?: number }) => string
   startRound: (roundId: string) => void
   endRound: (roundId: string) => void
   deleteRound: (roundId: string) => void
@@ -55,6 +55,11 @@ interface GameStore extends NormalizedStore {
   mergePulledQuestions: (questions: Question[]) => void
   mergePulledCategorySettings: (settings: CategorySettings[]) => void
 
+  // ── Topics ────────────────────────────────────────────────────────────────
+  addCustomTopic: (tag: string, label: string, emoji: string) => void
+  removeCustomTopic: (tag: string) => void
+  getAllTopics: () => import('@/lib/data').PredefinedTopic[]
+
   // ── Selectors ─────────────────────────────────────────────────────────────
   getSessionTeams: (sessionId: string) => Team[]
   getSessionRounds: (sessionId: string) => Round[]
@@ -63,7 +68,7 @@ interface GameStore extends NormalizedStore {
   getCurrentQuestion: (roundId: string) => Question | undefined
   getCategory: (categoryId: string) => typeof CATEGORIES[0] | undefined
   getRoundActivities: (roundId: string) => Activity[]
-  getAvailableQuestionCount: (categoryId: string, difficulty: string) => number
+  getAvailableQuestionCount: (categoryId: string, difficulty: string, topicTag?: string) => number
 }
 
 export const useGameStore = create<GameStore>()(
@@ -75,6 +80,7 @@ export const useGameStore = create<GameStore>()(
       activities: {},
       customQuestions: {},
       categorySettings: { ...DEFAULT_CATEGORY_SETTINGS },
+      customTopics: {},
       activeSessionId: null,
       answerRevealed: false,
       questionDone: false,
@@ -154,6 +160,7 @@ export const useGameStore = create<GameStore>()(
         const sessionTeams = get().getSessionTeams(sessionId)
         const round: Round = {
           id, sessionId, name: opts.name, categoryId: opts.categoryId,
+          topicTag: opts.topicTag,
           difficulty: opts.difficulty, questionLimit: opts.questionLimit,
           status: 'pending', questionQueue: [], questionIndex: 0,
           currentTeamTurnId: sessionTeams[0]?.id ?? null,
@@ -171,7 +178,8 @@ export const useGameStore = create<GameStore>()(
         const allQs = getAllQuestions()
         const pool = allQs.filter((q) =>
           q.categoryId === round.categoryId &&
-          (round.difficulty === 'all' || q.difficulty === round.difficulty)
+          (round.difficulty === 'all' || q.difficulty === round.difficulty) &&
+          (!round.topicTag || round.topicTag === '__all__' || q.topicTag === round.topicTag)
         )
         const shuffled = [...pool].sort(() => Math.random() - 0.5)
         const limited = round.questionLimit ? shuffled.slice(0, round.questionLimit) : shuffled
@@ -363,6 +371,38 @@ export const useGameStore = create<GameStore>()(
           return { categorySettings: next }
         }),
 
+      // ── Topics ───────────────────────────────────────────────────────────
+      addCustomTopic: (tag, label, emoji) => {
+        const key = tag.toLowerCase().trim()
+        if (!key) return
+        set((s) => ({
+          customTopics: {
+            ...s.customTopics,
+            [key]: { tag: key, label, emoji, createdAt: now() },
+          },
+        }))
+      },
+
+      removeCustomTopic: (tag) =>
+        set((s) => {
+          const next = { ...s.customTopics }
+          delete next[tag.toLowerCase().trim()]
+          return { customTopics: next }
+        }),
+
+      getAllTopics: () => {
+        const { PREDEFINED_TOPICS } = require('@/lib/data')
+        const custom = Object.values(get().customTopics).map((t) => ({
+          tag: t.tag, label: t.label, emoji: t.emoji,
+        }))
+        // Merge: predefined first, then custom ones not already in predefined
+        const predefinedTags = new Set(PREDEFINED_TOPICS.map((p: any) => p.tag))
+        return [
+          ...PREDEFINED_TOPICS,
+          ...custom.filter((c) => !predefinedTags.has(c.tag)),
+        ]
+      },
+
       // ── Selectors ────────────────────────────────────────────────────────
       getSessionTeams: (sessionId) =>
         Object.values(get().teams).filter((t) => t.sessionId === sessionId).sort((a,b) => a.createdAt - b.createdAt),
@@ -387,9 +427,11 @@ export const useGameStore = create<GameStore>()(
       getCategory: (categoryId) => CATEGORIES.find((c) => c.id === categoryId),
       getRoundActivities: (roundId) =>
         Object.values(get().activities).filter((a) => a.roundId === roundId).sort((a,b) => b.createdAt - a.createdAt),
-      getAvailableQuestionCount: (categoryId, difficulty) =>
+      getAvailableQuestionCount: (categoryId, difficulty, topicTag?) =>
         get().getAllQuestions().filter((q) =>
-          q.categoryId === categoryId && (difficulty === 'all' || q.difficulty === difficulty)
+          q.categoryId === categoryId &&
+          (difficulty === 'all' || q.difficulty === difficulty) &&
+          (!topicTag || topicTag === '__all__' || q.topicTag === topicTag)
         ).length,
     }),
     {
@@ -398,6 +440,7 @@ export const useGameStore = create<GameStore>()(
         sessions: s.sessions, teams: s.teams, rounds: s.rounds,
         activities: s.activities, customQuestions: s.customQuestions,
         categorySettings: s.categorySettings, activeSessionId: s.activeSessionId,
+        customTopics: s.customTopics,
       }),
     }
   )
