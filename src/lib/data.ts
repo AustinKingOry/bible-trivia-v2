@@ -109,8 +109,8 @@ export const CATEGORIES: Category[] = [
     rules: [
       'Admin reads the statement aloud.',
       'The active team has the answer timer to respond "True" or "False".',
-      'A wrong answer deducts points.',
-      'No steal mechanic — True/False is direct scoring only.',
+      'A wrong answer deducts points and opens a steal window for opponents.',
+      'The opposing team has the steal window to answer — if correct they score steal points.',
       'No pass allowed.',
     ],
   },
@@ -122,7 +122,7 @@ export const SCORING_MODES: Record<string, ScoringMode> = {
   sm_general:   { id:'sm_general',   name:'General',          pointsCorrect:10, pointsWrong:-3,  allowPass:true,  allowSteal:true,  stealPoints:7  },
   sm_hotseat:   { id:'sm_hotseat',   name:'Hot Seat',         pointsCorrect:5,  pointsWrong:0,   allowPass:false, allowSteal:false, stealPoints:0  },
   sm_openverse: { id:'sm_openverse', name:'Open the Verse',   pointsCorrect:20, pointsWrong:-10, allowPass:false, allowSteal:true,  stealPoints:15 },
-  sm_tf:        { id:'sm_tf',        name:'True or False',    pointsCorrect:8,  pointsWrong:-4,  allowPass:false, allowSteal:false, stealPoints:0  },
+  sm_tf:        { id:'sm_tf',        name:'True or False',    pointsCorrect:8,  pointsWrong:-4,  allowPass:false, allowSteal:true,  stealPoints:5  },
 }
 
 // Default CategorySettings — stored in Zustand and editable by admin
@@ -132,7 +132,7 @@ export const DEFAULT_CATEGORY_SETTINGS: Record<string, CategorySettings> = {
   character: { id:'cs_character', categoryId:'character', pointsCorrect:10, pointsWrong:-3,  stealPoints:7,  answerTimeSecs:30, stealTimeSecs:10, hotSeatTimeSecs:60, createdAt:0, updatedAt:0, synced:true },
   hotseat:   { id:'cs_hotseat',   categoryId:'hotseat',   pointsCorrect:5,  pointsWrong:0,   stealPoints:0,  answerTimeSecs:30, stealTimeSecs:10, hotSeatTimeSecs:60, createdAt:0, updatedAt:0, synced:true },
   openverse: { id:'cs_openverse', categoryId:'openverse', pointsCorrect:20, pointsWrong:-10, stealPoints:15, answerTimeSecs:45, stealTimeSecs:15, hotSeatTimeSecs:60, createdAt:0, updatedAt:0, synced:true },
-  truefalse: { id:'cs_truefalse', categoryId:'truefalse', pointsCorrect:8,  pointsWrong:-4,  stealPoints:0,  answerTimeSecs:20, stealTimeSecs:10, hotSeatTimeSecs:60, createdAt:0, updatedAt:0, synced:true },
+  truefalse: { id:'cs_truefalse', categoryId:'truefalse', pointsCorrect:8,  pointsWrong:-4,  stealPoints:5,  answerTimeSecs:20, stealTimeSecs:10, hotSeatTimeSecs:60, createdAt:0, updatedAt:0, synced:true },
 }
 
 export const SEED_QUESTIONS: Question[] = [
