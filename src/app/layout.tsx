@@ -3,15 +3,15 @@ import './globals.css'
 
 export const metadata: Metadata = {
   // 🔹 Basic
-  metadataBase: new URL("https://bible-trivia-opal.vercel.app"),
+  metadataBase: new URL("https://triviapath.vercel.app"),
   title: {
-    default: "QuizMaster | Trivia Game Management System",
-    template: "%s | QuizMaster",
+    default: "TriviaPath | Trivia Game Management System",
+    template: "%s | TriviaPath",
   },
   description:
     "A fast, offline-first trivia game management system for live quiz sessions. Manage teams, rounds, scoring, and questions across multiple categories including science, geography, and more.",
 
-  applicationName: "QuizMaster",
+  applicationName: "TriviaPath",
 
   // 🔹 Keywords (still useful for some engines + internal search)
   keywords: [
@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   ],
 
   // 🔹 Authors
-  authors: [{ name: "Austin", url: "https://bible-trivia-opal.vercel.app" }],
+  authors: [{ name: "Austin", url: "https://triviapath.vercel.app" }],
   creator: "Austin King'ori",
-  publisher: "QuizMaster",
+  publisher: "TriviaPath",
 
   // 🔹 Robots (SEO rules)
   robots: {
@@ -88,17 +88,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://bible-trivia-opal.vercel.app",
-    title: "QuizMaster | Trivia Game Management System",
+    url: "https://triviapath.vercel.app",
+    title: "TriviaPath | Trivia Game Management System",
     description:
       "Run live trivia sessions with ease. Manage teams, rounds, scoring, and questions in a fast, offline-first system.",
-    siteName: "QuizMaster",
+    siteName: "TriviaPath",
     images: [
       {
-        url: "https://bible-trivia-opal.vercel.app/og-image.png",
+        url: "https://triviapath.vercel.app/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "QuizMaster Trivia App",
+        alt: "TriviaPath Trivia App",
       },
     ],
   },
@@ -106,17 +106,17 @@ export const metadata: Metadata = {
   // 🔹 Twitter
   twitter: {
     card: "summary_large_image",
-    title: "QuizMaster | Trivia Game Management",
+    title: "TriviaPath | Trivia Game Management",
     description:
       "A powerful offline-first trivia game engine for live sessions.",
     creator: "@IamKingOry",
-    images: ["https://bible-trivia-opal.vercel.app/og-image.png"],
+    images: ["https://triviapath.vercel.app/og-image.jpg"],
   },
 
   // 🔹 App Links (deep linking)
   appLinks: {
     web: {
-      url: "https://bible-trivia-opal.vercel.app",
+      url: "https://triviapath.vercel.app",
     },
   },
 
@@ -127,7 +127,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "QuizMaster",
+    title: "TriviaPath",
   },
 
   // 🔹 Format detection (avoid unwanted auto-linking)
