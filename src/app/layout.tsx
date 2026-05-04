@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | TriviaPath",
   },
   description:
-    "A fast, offline-first trivia game management system for live quiz sessions. Manage teams, rounds, scoring, and questions across multiple categories including science, geography, and more.",
+    "A fast, offline-first trivia game management system for live quiz sessions. Manage teams, rounds, scoring, and questions across multiple categories.",
 
   applicationName: "TriviaPath",
 
@@ -161,6 +161,16 @@ export const metadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
   },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
