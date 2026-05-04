@@ -78,7 +78,7 @@ export const metadata: Metadata = {
       { url: "/icon.png", type: "image/png" },
     ],
     apple: [{ url: "/apple-icon.png" }],
-    shortcut: ["/shortcut-icon.png"],
+    shortcut: ["/apple-icon.png"],
   },
 
   // 🔹 Manifest (PWA)
