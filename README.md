@@ -159,6 +159,3 @@ The architecture is explicitly designed for:
 TO DO
 3. Create the pdf upload
 4. Implement backend (AI extraction and database integration)
-
-
-Fix: true/false questions' rules are just like any other. Points can be stolen just like other question types.
