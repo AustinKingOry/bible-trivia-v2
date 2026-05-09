@@ -6,7 +6,7 @@ export interface ImageQuestion {
   answer: string          // the correct identification
   hint?: string           // optional hint shown after timer
   topicTag?: string       // e.g. 'bible', 'science', 'geography'
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: 'easy' | 'medium' | 'hard' | 'all'
   source: 'manual' | 'ai'
   createdAt: number
   updatedAt: number
