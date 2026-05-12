@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
+import { useImageGameStore } from '@/store/imageGameStore'
 import { useAuth } from '@/hooks/useAuth'
 import { runSync, type SyncStatus } from '@/lib/sync'
 import { getSupabaseClient } from '@/lib/supabase'
@@ -22,39 +23,56 @@ export interface UseSyncReturn {
 }
 
 export function useSync(): UseSyncReturn {
-  const [status, setStatus]             = useState<SyncStatus>('idle')
+  const [status, setStatus] = useState<SyncStatus>('idle')
   const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null)
   const [lastPulledAt, setLastPulledAt] = useState<number | null>(null)
   const syncingRef = useRef(false)
 
   const { user } = useAuth()
 
-  // Granular dirty-count selectors — no full store re-renders
+  // ── Trivia game dirty counts ───────────────────────────────────────────────
   const dirtyQCount  = useGameStore((s) => Object.values(s.customQuestions).filter((q) => q.synced === false).length)
   const dirtySnCount = useGameStore((s) => Object.values(s.sessions).filter((x)        => x.synced === false).length)
   const dirtyTCount  = useGameStore((s) => Object.values(s.teams).filter((x)           => x.synced === false).length)
   const dirtyRCount  = useGameStore((s) => Object.values(s.rounds).filter((x)          => x.synced === false).length)
   const dirtyACount  = useGameStore((s) => Object.values(s.activities).filter((x)      => x.synced === false).length)
   const dirtyCsCount = useGameStore((s) => Object.values(s.categorySettings).filter((x) => (x as any).synced === false).length)
-  const dirtyCount   = dirtyQCount + dirtySnCount + dirtyTCount + dirtyRCount + dirtyACount + dirtyCsCount
 
+  // ── Image game dirty counts ────────────────────────────────────────────────
+  const dirtyIQCount = useImageGameStore((s) => Object.values(s.questions).filter((q) => q.synced === false).length)
+  const dirtyISCount = useImageGameStore((s) => Object.values(s.sessions).filter((s2) => (s2 as any).synced === false).length)
+
+  const dirtyCount =
+    dirtyQCount + dirtySnCount + dirtyTCount + dirtyRCount + dirtyACount + dirtyCsCount +
+    dirtyIQCount + dirtyISCount
+
+  // ── getDirtyPayload reads from getState() at call time — no reactive dep ──
   const getDirtyPayload = useCallback((userId: string) => {
-    const { sessions, teams, rounds, activities, customQuestions, categorySettings } = useGameStore.getState()
+    const triviaStore = useGameStore.getState()
+    const imageStore  = useImageGameStore.getState()
+    const igDirty     = imageStore.getDirtyPayload()
+
     return {
       userId,
-      dirtyQuestions:         Object.values(customQuestions).filter((q)  => q.synced === false),
-      dirtySessions:          Object.values(sessions).filter((s)          => s.synced === false),
-      dirtyTeams:             Object.values(teams).filter((t)             => t.synced === false),
-      dirtyRounds:            Object.values(rounds).filter((r)            => r.synced === false),
-      dirtyActivities:        Object.values(activities).filter((a)        => a.synced === false),
-      dirtyCategorySettings:  Object.values(categorySettings).filter((cs) => (cs as any).synced === false),
-      lastPulledAt:           lastPulledAt ?? undefined,
+      dirtyQuestions:         Object.values(triviaStore.customQuestions).filter((q)  => q.synced === false),
+      dirtySessions:          Object.values(triviaStore.sessions).filter((s)          => s.synced === false),
+      dirtyTeams:             Object.values(triviaStore.teams).filter((t)             => t.synced === false),
+      dirtyRounds:            Object.values(triviaStore.rounds).filter((r)            => r.synced === false),
+      dirtyActivities:        Object.values(triviaStore.activities).filter((a)        => a.synced === false),
+      dirtyCategorySettings:  Object.values(triviaStore.categorySettings).filter((cs) => (cs as any).synced === false),
+      imageGame: {
+        dirtyQuestions:  igDirty.dirtyQuestions,
+        dirtySessions:   igDirty.dirtySessions,
+        dirtyRounds:     igDirty.dirtyRounds,
+        dirtyActivities: igDirty.dirtyActivities,
+      },
+      lastPulledAt: lastPulledAt ?? undefined,
     }
   }, [lastPulledAt])
 
   const syncNow = useCallback(async () => {
     if (!isSupabaseConfigured() || syncingRef.current) return
-    if (!user) return   // must be authenticated to sync
+    if (!user) return
     syncingRef.current = true
     setStatus('syncing')
 
@@ -68,6 +86,7 @@ export function useSync(): UseSyncReturn {
         return
       }
 
+      // ── Mark trivia game records as synced ─────────────────────────────────
       const { markSynced, mergePulledQuestions, mergePulledCategorySettings } = useGameStore.getState()
 
       markSynced({
@@ -86,9 +105,21 @@ export function useSync(): UseSyncReturn {
         mergePulledCategorySettings(result._pulled.categorySettings)
       }
 
-      const now = Date.now()
-      setLastSyncedAt(now)
-      setLastPulledAt(now)
+      // ── Mark image game records as synced ──────────────────────────────────
+      const { markImageSynced, mergePulledImageQuestions } = useImageGameStore.getState()
+
+      markImageSynced({
+        questions: payload.imageGame.dirtyQuestions.map((q) => q.id),
+        sessions:  payload.imageGame.dirtySessions.map((s)  => s.id),
+      })
+
+      if (result._pulled?.imageQuestions?.length) {
+        mergePulledImageQuestions(result._pulled.imageQuestions)
+      }
+
+      const n = Date.now()
+      setLastSyncedAt(n)
+      setLastPulledAt(n)
       setStatus('ok')
     } catch (err) {
       console.error('[sync] unexpected error:', err)
@@ -98,7 +129,7 @@ export function useSync(): UseSyncReturn {
     }
   }, [user, getDirtyPayload])
 
-  // Auto-sync when user logs in or on interval
+  // Auto-sync on mount when user logs in, then on interval
   useEffect(() => {
     if (!isSupabaseConfigured() || !user) return
     syncNow()
