@@ -45,6 +45,7 @@ export interface ImageRound {
   pointsWrong: number
   createdAt: number
   updatedAt: number
+  synced: boolean
 }
 
 export interface ImageActivity {
@@ -56,6 +57,7 @@ export interface ImageActivity {
   result: 'correct' | 'wrong' | 'skip'
   points: number
   createdAt: number
+  synced: boolean
 }
 
 export interface ImageSession {
@@ -68,4 +70,5 @@ export interface ImageSession {
   status: 'setup' | 'active' | 'ended'
   createdAt: number
   updatedAt: number
+  synced: boolean
 }
