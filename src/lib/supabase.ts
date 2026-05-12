@@ -3,6 +3,12 @@ import type {
   Question, Session, Team, Round, Activity,
 } from '@/types'
 
+// ─── Image Game mappers ───────────────────────────────────────────────────────
+
+import type {
+  ImageQuestion, ImageSession, ImageParticipant, ImageRound, ImageActivity,
+} from '@/types/imageGame'
+
 // ─── Database row shapes (snake_case, matching SQL schema) ────────────────────
 
 export interface DbQuestion {
@@ -373,5 +379,240 @@ export function categorySettingsToDb(cs: import('@/types').CategorySettings, use
     created_at:          cs.createdAt,
     updated_at:          cs.updatedAt,
     deleted_at:          null,
+  }
+}
+
+// ─── Image Game DB interfaces ─────────────────────────────────────────────────
+
+export interface DbImageQuestion {
+  id: string
+  user_id: string | null
+  image_url: string
+  answer: string
+  hint: string | null
+  topic_tag: string | null
+  difficulty: string
+  source: string
+  created_at: number
+  updated_at: number
+  deleted_at: number | null
+}
+
+export interface DbImageSession {
+  id: string
+  user_id: string | null
+  name: string
+  participant_mode: string
+  status: string
+  created_at: number
+  updated_at: number
+  deleted_at: number | null
+}
+
+export interface DbImageParticipant {
+  id: string
+  user_id: string | null
+  session_id: string
+  name: string
+  type: string
+  members: string[]
+  color: string
+  score: number
+  sort_order: number
+  created_at: number
+  updated_at: number
+  deleted_at: number | null
+}
+
+export interface DbImageRound {
+  id: string
+  user_id: string | null
+  session_id: string
+  name: string
+  topic_tag: string | null
+  difficulty: string | null
+  status: string
+  question_queue: string[]
+  question_index: number
+  participant_queue: string[]
+  answer_time_secs: number
+  points_correct: number
+  points_wrong: number
+  created_at: number
+  updated_at: number
+  deleted_at: number | null
+}
+
+export interface DbImageActivity {
+  id: string
+  user_id: string | null
+  session_id: string
+  round_id: string
+  question_id: string
+  participant_id: string
+  result: string
+  points: number
+  created_at: number
+}
+
+export function dbToImageQuestion(row: DbImageQuestion): ImageQuestion {
+  return {
+    id:         row.id,
+    imageUrl:   row.image_url,
+    answer:     row.answer,
+    hint:       row.hint ?? undefined,
+    topicTag:   row.topic_tag ?? undefined,
+    difficulty: row.difficulty as ImageQuestion['difficulty'],
+    source:     row.source as ImageQuestion['source'],
+    createdAt:  row.created_at,
+    updatedAt:  row.updated_at,
+    deletedAt:  row.deleted_at ?? undefined,
+    synced:     true,
+  }
+}
+
+export function imageQuestionToDb(q: ImageQuestion, userId?: string): DbImageQuestion {
+  return {
+    id:         q.id,
+    user_id:    userId ?? null,
+    image_url:  q.imageUrl,
+    answer:     q.answer,
+    hint:       q.hint ?? null,
+    topic_tag:  q.topicTag ?? null,
+    difficulty: q.difficulty,
+    source:     q.source,
+    created_at: q.createdAt,
+    updated_at: q.updatedAt,
+    deleted_at: q.deletedAt ?? null,
+  }
+}
+
+export function dbToImageSession(row: DbImageSession): ImageSession {
+  return {
+    id:              row.id,
+    name:            row.name,
+    participantMode: row.participant_mode as ImageSession['participantMode'],
+    status:          row.status as ImageSession['status'],
+    participants:    [],   // loaded separately from image_participants
+    rounds:          [],   // loaded separately from image_rounds
+    activities:      [],   // loaded separately from image_activities
+    createdAt:       row.created_at,
+    updatedAt:       row.updated_at,
+    synced:          true,
+  }
+}
+
+export function imageSessionToDb(s: ImageSession, userId?: string): DbImageSession {
+  return {
+    id:               s.id,
+    user_id:          userId ?? null,
+    name:             s.name,
+    participant_mode: s.participantMode,
+    status:           s.status,
+    created_at:       s.createdAt,
+    updated_at:       s.updatedAt,
+    deleted_at:       null,
+  }
+}
+
+export function dbToImageParticipant(row: DbImageParticipant): ImageParticipant {
+  return {
+    id:      row.id,
+    name:    row.name,
+    type:    row.type as ImageParticipant['type'],
+    members: row.members ?? [],
+    color:   row.color,
+    score:   row.score,
+  }
+}
+
+export function imageParticipantToDb(
+  p: ImageParticipant,
+  sessionId: string,
+  sortOrder: number,
+  userId?: string
+): DbImageParticipant {
+  return {
+    id:         p.id,
+    user_id:    userId ?? null,
+    session_id: sessionId,
+    name:       p.name,
+    type:       p.type,
+    members:    p.members ?? [],
+    color:      p.color,
+    score:      p.score,
+    sort_order: sortOrder,
+    created_at: Date.now(),
+    updated_at: Date.now(),
+    deleted_at: null,
+  }
+}
+
+export function dbToImageRound(row: DbImageRound): ImageRound {
+  return {
+    id:               row.id,
+    sessionId:        row.session_id,
+    name:             row.name,
+    topicTag:         row.topic_tag ?? undefined,
+    difficulty:       (row.difficulty ?? 'all') as ImageRound['difficulty'],
+    status:           row.status as ImageRound['status'],
+    questionQueue:    row.question_queue,
+    questionIndex:    row.question_index,
+    participantQueue: row.participant_queue,
+    answerTimeSecs:   row.answer_time_secs,
+    pointsCorrect:    row.points_correct,
+    pointsWrong:      row.points_wrong,
+    createdAt:        row.created_at,
+    updatedAt:        row.updated_at,
+    synced:           true,
+  }
+}
+
+export function imageRoundToDb(r: ImageRound, userId?: string): DbImageRound {
+  return {
+    id:               r.id,
+    user_id:          userId ?? null,
+    session_id:       r.sessionId,
+    name:             r.name,
+    topic_tag:        r.topicTag ?? null,
+    difficulty:       r.difficulty ?? 'all',
+    status:           r.status,
+    question_queue:   r.questionQueue,
+    question_index:   r.questionIndex,
+    participant_queue: r.participantQueue,
+    answer_time_secs: r.answerTimeSecs,
+    points_correct:   r.pointsCorrect,
+    points_wrong:     r.pointsWrong,
+    created_at:       r.createdAt,
+    updated_at:       r.updatedAt,
+    deleted_at:       null,
+  }
+}
+
+export function dbToImageActivity(row: DbImageActivity): ImageActivity {
+  return {
+    id:            row.id,
+    sessionId:     row.session_id,
+    roundId:       row.round_id,
+    questionId:    row.question_id,
+    participantId: row.participant_id,
+    result:        row.result as ImageActivity['result'],
+    points:        row.points,
+    createdAt:     row.created_at,
+    synced:        true,
+  }
+}
+
+export function imageActivityToDb(a: ImageActivity, userId?: string): DbImageActivity {
+  return {
+    id:             a.id,
+    user_id:        userId ?? null,
+    session_id:     a.sessionId,
+    round_id:       a.roundId,
+    question_id:    a.questionId,
+    participant_id: a.participantId,
+    result:         a.result,
+    points:         a.points,
+    created_at:     a.createdAt,
   }
 }
