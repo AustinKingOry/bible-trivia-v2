@@ -56,33 +56,18 @@ export const metadata: Metadata = {
     },
   },
 
-  // 🔹 Viewport (modern SEO requirement)
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
-
-  // 🔹 Theme
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
-  ],
-
-  colorScheme: "light dark",
-
   // 🔹 Icons
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/apple-touch-icon.png", type: "image/png" },
     ],
     apple: [{ url: "/apple-touch-icon.png" }],
     shortcut: ["/apple-touch-icon.png"],
   },
 
   // 🔹 Manifest (PWA)
-  manifest: "/manifest.json",
+  manifest: "/site.webmanifest",
 
   // 🔹 Open Graph (Facebook, WhatsApp, LinkedIn)
   openGraph: {
@@ -171,6 +156,8 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
   ],
+  
+  colorScheme: "light dark",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
