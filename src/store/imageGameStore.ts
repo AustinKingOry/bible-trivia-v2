@@ -73,6 +73,12 @@ interface ImageGameStore {
   getCurrentQuestion: (sessionId: string, roundId: string) => ImageQuestion | undefined
   getLeaderboard: (sessionId: string) => ImageParticipant[]
   getAvailableCount: (topicTag?: string, difficulty?: string) => number
+
+  //── Sync ──────────────────────────────────────────────────────────────────
+  markImageSynced: (ids: { questions?: string[]; sessions?: string[] }) => void
+  mergePulledImageQuestions: (questions: ImageQuestion[]) => void
+  getDirtyPayload: () => { dirtyQuestions: ImageQuestion[]; dirtySessions: ImageSession[]
+  dirtyRounds: ImageRound[]; dirtyActivities: ImageActivity[] }
 }
 
 export const useImageGameStore = create<ImageGameStore>()(
@@ -87,8 +93,7 @@ export const useImageGameStore = create<ImageGameStore>()(
         const session: ImageSession = {
           id, name, participantMode,
           participants: [], rounds: [], activities: [],
-          status: 'setup', createdAt: now(), updatedAt: now(),
-        }
+          status: 'setup', createdAt: now(), updatedAt: now(), synced: false}
         set((s) => ({ sessions: { ...s.sessions, [id]: session } }))
         return id
       },
@@ -98,7 +103,7 @@ export const useImageGameStore = create<ImageGameStore>()(
 
       endSession: (id) =>
         set((s) => ({
-          sessions: { ...s.sessions, [id]: { ...s.sessions[id], status: 'ended', updatedAt: now() } },
+          sessions: { ...s.sessions, [id]: { ...s.sessions[id], status: 'ended', updatedAt: now(), synced: false } },
         })),
 
       // ── Participants ───────────────────────────────────────────────────────
@@ -112,7 +117,7 @@ export const useImageGameStore = create<ImageGameStore>()(
         set((s) => ({
           sessions: {
             ...s.sessions,
-            [sessionId]: { ...session, participants: [...session.participants, p], updatedAt: now() },
+            [sessionId]: { ...session, participants: [...session.participants, p], updatedAt: now(), synced: false },
           },
         }))
       },
@@ -126,6 +131,7 @@ export const useImageGameStore = create<ImageGameStore>()(
               ...session,
               participants: session.participants.filter((p) => p.id !== participantId),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -142,6 +148,7 @@ export const useImageGameStore = create<ImageGameStore>()(
                 p.id === participantId ? { ...p, ...patch } : p
               ),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -153,29 +160,28 @@ export const useImageGameStore = create<ImageGameStore>()(
         const [moved] = arr.splice(from, 1)
         arr.splice(to, 0, moved)
         set((s) => ({
-          sessions: { ...s.sessions, [sessionId]: { ...session, participants: arr, updatedAt: now() } },
+          sessions: { ...s.sessions, [sessionId]: { ...session, participants: arr, updatedAt: now(), synced: false } },
         }))
       },
 
       // ── Questions ──────────────────────────────────────────────────────────
       addQuestion: (q) => {
         const id = uid('igq')
-        const question: ImageQuestion = { ...q, id, createdAt: now(), updatedAt: now() }
+        const question: ImageQuestion = { ...q, id, createdAt: now(), updatedAt: now(), synced: false }
         set((s) => ({ questions: { ...s.questions, [id]: question } }))
         return id
       },
 
       updateQuestion: (id, patch) =>
         set((s) => ({
-          questions: { ...s.questions, [id]: { ...s.questions[id], ...patch, updatedAt: now() } },
-        })),
+          questions: { ...s.questions, [id]: { ...s.questions[id], ...patch, updatedAt: now(), synced: false }
+        },
+      })),
 
       deleteQuestion: (id) =>
-        set((s) => {
-          const questions = { ...s.questions }
-          questions[id] = { ...questions[id], deletedAt: now() }
-          return { questions }
-        }),
+        set((s) => ({
+          questions: { ...s.questions, [id]: { ...s.questions[id], deletedAt: now(), updatedAt: now(), synced: false } },
+      })),
 
       getFilteredQuestions: (topicTag, difficulty) =>
         Object.values(get().questions).filter((q) => {
@@ -202,11 +208,12 @@ export const useImageGameStore = create<ImageGameStore>()(
           pointsCorrect: opts.pointsCorrect ?? 10,
           pointsWrong: opts.pointsWrong ?? 0,
           createdAt: now(), updatedAt: now(),
+          synced: false,
         }
         set((s) => ({
           sessions: {
             ...s.sessions,
-            [sessionId]: { ...session, rounds: [...session.rounds, round], updatedAt: now() },
+            [sessionId]: { ...session, rounds: [...session.rounds, round], updatedAt: now(), synced: false },
           },
         }))
         return id
@@ -222,7 +229,7 @@ export const useImageGameStore = create<ImageGameStore>()(
         const participantQueue = session.participants.map((p) => p.id)
         const updated: ImageRound = {
           ...round, status: 'active', questionQueue: queue, questionIndex: 0,
-          participantQueue, updatedAt: now(),
+          participantQueue, updatedAt: now(), synced: false,
         }
         set((s) => ({
           sessions: {
@@ -232,6 +239,7 @@ export const useImageGameStore = create<ImageGameStore>()(
               status: 'active',
               rounds: session.rounds.map((r) => r.id === roundId ? updated : r),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -245,9 +253,10 @@ export const useImageGameStore = create<ImageGameStore>()(
             [sessionId]: {
               ...session,
               rounds: session.rounds.map((r) =>
-                r.id === roundId ? { ...r, status: 'completed' as ImageRoundStatus, updatedAt: now() } : r
+                r.id === roundId ? { ...r, status: 'completed' as ImageRoundStatus, updatedAt: now(), synced: false } : r
               ),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -263,6 +272,7 @@ export const useImageGameStore = create<ImageGameStore>()(
               rounds: session.rounds.filter((r) => r.id !== roundId),
               activities: session.activities.filter((a) => a.roundId !== roundId),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -278,7 +288,7 @@ export const useImageGameStore = create<ImageGameStore>()(
         const points = result === 'correct' ? round.pointsCorrect : result === 'wrong' ? -round.pointsWrong : 0
         const activity: ImageActivity = {
           id: uid('iga'), sessionId, roundId, questionId,
-          participantId: currentParticipantId, result, points, createdAt: now(),
+          participantId: currentParticipantId, result, points, createdAt: now(), synced: false,
         }
 
         // Update participant score
@@ -294,6 +304,7 @@ export const useImageGameStore = create<ImageGameStore>()(
               participants: updatedParticipants,
               activities: [...session.activities, activity],
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -316,10 +327,11 @@ export const useImageGameStore = create<ImageGameStore>()(
               ...session,
               rounds: session.rounds.map((r) =>
                 r.id === roundId
-                  ? { ...r, questionIndex: nextIdx, participantQueue: rotated, updatedAt: now() }
+                  ? { ...r, questionIndex: nextIdx, participantQueue: rotated, updatedAt: now(), synced: false }
                   : r
               ),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -335,9 +347,10 @@ export const useImageGameStore = create<ImageGameStore>()(
             [sessionId]: {
               ...session,
               rounds: session.rounds.map((r) =>
-                r.id === roundId ? { ...r, participantQueue: rotated, updatedAt: now() } : r
+                r.id === roundId ? { ...r, participantQueue: rotated, updatedAt: now(), synced: false } : r
               ),
               updatedAt: now(),
+              synced: false,
             },
           },
         }))
@@ -363,6 +376,38 @@ export const useImageGameStore = create<ImageGameStore>()(
 
       getAvailableCount: (topicTag, difficulty) =>
         get().getFilteredQuestions(topicTag, difficulty).length,
+
+      // ── Sync ──────────────────────────────────────────────────────────────
+      markImageSynced: ({ questions = [], sessions = [] }) =>
+        set((s) => {
+          const nextQ = { ...s.questions }
+          questions.forEach((id) => { if (nextQ[id]) nextQ[id] = { ...nextQ[id], synced: true } })
+          const nextS = { ...s.sessions }
+          sessions.forEach((id) => { if (nextS[id]) nextS[id] = { ...nextS[id], synced: true } })
+          return { questions: nextQ, sessions: nextS }
+        }),
+
+      mergePulledImageQuestions: (pulled) =>
+        set((s) => {
+          const next = { ...s.questions }
+          pulled.forEach((q) => {
+            const existing = next[q.id]
+            if (!existing || q.updatedAt > (existing.updatedAt ?? 0)) {
+              next[q.id] = { ...q, synced: true }
+            }
+          })
+          return { questions: next }
+        }),
+
+      getDirtyPayload: () => {
+        const { sessions, questions } = get()
+        const dirtySessions   = Object.values(sessions).filter((s) => (s as any).synced === false)
+        const dirtyQuestions  = Object.values(questions).filter((q) => q.synced === false)
+        // Collect rounds and activities from dirty sessions
+        const dirtyRounds     = dirtySessions.flatMap((s) => s.rounds)
+        const dirtyActivities = dirtySessions.flatMap((s) => s.activities)
+        return { dirtyQuestions, dirtySessions, dirtyRounds, dirtyActivities }
+      },
     }),
     {
       name: 'btgms-image-game-v1',
