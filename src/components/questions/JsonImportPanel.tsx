@@ -159,9 +159,9 @@ Return an array. Example:
 
 // ─── Category helpers ─────────────────────────────────────────────────────────
 const DIFF_STYLE: Record<string, { color: string; bg: string; border: string }> = {
-  easy:   { color: '#6DFFAA', bg: 'rgba(26,138,74,0.15)',  border: 'rgba(26,138,74,0.4)'  },
-  medium: { color: '#F5C842', bg: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.4)' },
-  hard:   { color: '#FF8A80', bg: 'rgba(192,57,43,0.15)',  border: 'rgba(192,57,43,0.4)'  },
+  easy:   { color: 'var(--success)', bg: 'color-mix(in oklab, var(--success-solid) 15%, transparent)',  border: 'color-mix(in oklab, var(--success-solid) 40%, transparent)'  },
+  medium: { color: 'var(--primary)', bg: 'color-mix(in oklab, var(--primary) 12%, transparent)', border: 'color-mix(in oklab, var(--primary) 40%, transparent)' },
+  hard:   { color: 'var(--danger)', bg: 'color-mix(in oklab, var(--danger-solid) 15%, transparent)',  border: 'color-mix(in oklab, var(--danger-solid) 40%, transparent)'  },
 }
 
 type ImportStep = 'prompt' | 'paste' | 'preview'
@@ -248,19 +248,19 @@ export function JsonImportPanel() {
                 onClick={() => { if (isDone || isActive) setStep(s) }}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap"
                 style={isActive
-                  ? { background: 'rgba(245,200,66,0.12)', color: '#F5C842', border: '1px solid rgba(245,200,66,0.3)' }
+                  ? { background: 'color-mix(in oklab, var(--primary) 12%, transparent)', color: 'var(--primary)', border: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)' }
                   : isDone
-                  ? { color: '#6DFFAA', cursor: 'pointer' }
-                  : { color: '#9BA8C4' }
+                  ? { color: 'var(--success)', cursor: 'pointer' }
+                  : { color: 'var(--muted-foreground)' }
                 }
               >
-                <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                  style={isActive ? { background: '#F5C842', color: '#0A1628' } : isDone ? { background: 'rgba(26,138,74,0.3)', color: '#6DFFAA' } : { background: 'rgba(255,255,255,0.1)', color: '#9BA8C4' }}>
+                <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                  style={isActive ? { background: 'var(--primary)', color: 'var(--background)' } : isDone ? { background: 'color-mix(in oklab, var(--success-solid) 30%, transparent)', color: 'var(--success)' } : { background: 'color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }}>
                   {isDone ? '✓' : i + 1}
                 </span>
                 {labels[i]}
               </button>
-              {i < 2 && <div className="flex-1 h-px mx-2" style={{ background: isDone ? 'rgba(26,138,74,0.4)' : 'rgba(255,255,255,0.1)' }} />}
+              {i < 2 && <div className="flex-1 h-px mx-2" style={{ background: isDone ? 'color-mix(in oklab, var(--success-solid) 40%, transparent)' : 'color-mix(in oklab, var(--foreground) 10%, transparent)' }} />}
             </div>
           )
         })}
@@ -272,34 +272,34 @@ export function JsonImportPanel() {
         {step === 'prompt' && (
           <div className="animate-fade-in">
             <div className="mb-5">
-              <h3 className="font-display text-xl tracking-widest text-[#F0EDD8] mb-1">Get the AI Prompt</h3>
-              <p className="text-xs text-[#9BA8C4] leading-relaxed">
-                Copy the prompt below, then open <strong className="text-[#F0EDD8]">ChatGPT, Claude, or Gemini</strong>.
+              <h3 className="font-display text-xl tracking-widest text-foreground mb-1">Get the AI Prompt</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Copy the prompt below, then open <strong className="text-foreground">ChatGPT, Claude, or Gemini</strong>.
                 Paste the prompt first, then paste or describe your Bible content (a PDF excerpt, chapter, topic, etc.).
                 The AI will return a JSON array of questions. Come back here and paste that JSON in the next step.
               </p>
             </div>
 
             {/* Prompt box */}
-            <div className="relative rounded-xl overflow-hidden mb-4" style={{ border: '1px solid rgba(123,47,190,0.35)' }}>
-              <div className="flex items-center justify-between px-4 py-2.5 border-b" style={{ background: 'rgba(123,47,190,0.15)', borderColor: 'rgba(123,47,190,0.3)' }}>
+            <div className="relative rounded-xl overflow-hidden mb-4" style={{ border: '1px solid color-mix(in oklab, var(--secondary) 35%, transparent)' }}>
+              <div className="flex items-center justify-between px-4 py-2.5 border-b" style={{ background: 'color-mix(in oklab, var(--secondary) 15%, transparent)', borderColor: 'color-mix(in oklab, var(--secondary) 30%, transparent)' }}>
                 <div className="flex items-center gap-2">
-                  <span className="text-[#C084FC] text-sm">📋</span>
-                  <span className="text-xs font-semibold text-[#C084FC] tracking-wide">AI Extraction Prompt</span>
+                  <span className="text-secondary text-sm">📋</span>
+                  <span className="text-xs font-semibold text-secondary tracking-wide">AI Extraction Prompt</span>
                 </div>
                 <button
                   onClick={handleCopy}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                   style={copied
-                    ? { background: 'rgba(26,138,74,0.25)', border: '1px solid rgba(26,138,74,0.5)', color: '#6DFFAA' }
-                    : { background: 'rgba(123,47,190,0.25)', border: '1px solid rgba(123,47,190,0.4)', color: '#C084FC' }
+                    ? { background: 'color-mix(in oklab, var(--success-solid) 25%, transparent)', border: '1px solid color-mix(in oklab, var(--success-solid) 50%, transparent)', color: 'var(--success)' }
+                    : { background: 'color-mix(in oklab, var(--secondary) 25%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 40%, transparent)', color: 'var(--secondary)' }
                   }
                 >
                   {copied ? '✓ Copied!' : '⎘ Copy prompt'}
                 </button>
               </div>
               <pre
-                className="text-[11px] text-[#9BA8C4] leading-relaxed overflow-auto p-4 max-h-72 select-all"
+                className="text-[11px] text-muted-foreground leading-relaxed overflow-auto p-4 max-h-72 select-all"
                 style={{ background: 'rgba(0,0,0,0.3)', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
               >
                 {SYSTEM_PROMPT}
@@ -314,9 +314,9 @@ export function JsonImportPanel() {
                 { icon: '🎯', tip: 'Specify "10 easy True or False questions" to guide the output' },
                 { icon: '🔁', tip: 'Run it again for more questions — duplicates are easy to deselect' },
               ].map((t, i) => (
-                <div key={i} className="flex items-start gap-2.5 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <span className="text-lg flex-shrink-0">{t.icon}</span>
-                  <p className="text-[11px] text-[#9BA8C4] leading-relaxed">{t.tip}</p>
+                <div key={i} className="flex items-start gap-2.5 p-3 rounded-lg" style={{ background: 'color-mix(in oklab, var(--foreground) 3%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 7%, transparent)' }}>
+                  <span className="text-lg shrink-0">{t.icon}</span>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">{t.tip}</p>
                 </div>
               ))}
             </div>
@@ -324,7 +324,7 @@ export function JsonImportPanel() {
             <button
               onClick={() => setStep('paste')}
               className="w-full py-3.5 rounded-xl font-display text-xl tracking-widest transition-all"
-              style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+              style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
               onMouseOver={(e) => (e.currentTarget.style.opacity = '0.88')}
               onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
             >
@@ -337,9 +337,9 @@ export function JsonImportPanel() {
         {step === 'paste' && (
           <div className="animate-fade-in">
             <div className="mb-4">
-              <h3 className="font-display text-xl tracking-widest text-[#F0EDD8] mb-1">Paste Your JSON</h3>
-              <p className="text-xs text-[#9BA8C4]">
-                Paste the raw JSON returned by the AI. Markdown code fences (<code className="text-[#F5C842]">```json</code>) are stripped automatically.
+              <h3 className="font-display text-xl tracking-widest text-foreground mb-1">Paste Your JSON</h3>
+              <p className="text-xs text-muted-foreground">
+                Paste the raw JSON returned by the AI. Markdown code fences (<code className="text-primary">```json</code>) are stripped automatically.
               </p>
             </div>
 
@@ -348,41 +348,41 @@ export function JsonImportPanel() {
                 value={jsonText}
                 onChange={(e) => { setJsonText(e.target.value); setParseError(null) }}
                 placeholder={`Paste JSON here — e.g.\n[\n  {\n    "categoryId": "general",\n    "difficulty": "easy",\n    "question": "Who built the ark?",\n    "answer": "Noah"\n  }\n]`}
-                className="w-full rounded-xl text-xs text-[#F0EDD8] outline-none resize-none"
+                className="w-full rounded-xl text-xs text-foreground outline-hidden resize-none"
                 style={{
                   background: 'rgba(0,0,0,0.35)',
-                  border: `1.5px solid ${parseError ? '#C0392B' : 'rgba(245,200,66,0.2)'}`,
+                  border: `1.5px solid ${parseError ? 'var(--danger-solid)' : 'color-mix(in oklab, var(--primary) 20%, transparent)'}`,
                   fontFamily: 'monospace',
                   padding: '14px',
                   minHeight: '280px',
                   lineHeight: '1.6',
                 }}
-                onFocus={(e) => { if (!parseError) e.target.style.borderColor = '#F5C842' }}
-                onBlur={(e) => { if (!parseError) e.target.style.borderColor = 'rgba(245,200,66,0.2)' }}
+                onFocus={(e) => { if (!parseError) e.target.style.borderColor = 'var(--primary)' }}
+                onBlur={(e) => { if (!parseError) e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 20%, transparent)' }}
                 spellCheck={false}
               />
               {jsonText && (
                 <button
                   onClick={() => { setJsonText(''); setParseError(null) }}
-                  className="absolute top-3 right-3 text-[#9BA8C4] hover:text-red-400 transition-colors text-lg leading-none"
+                  className="absolute top-3 right-3 text-muted-foreground hover:text-red-400 transition-colors text-lg leading-none"
                 >×</button>
               )}
             </div>
 
             {/* Character count */}
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] text-[#9BA8C4]">{jsonText.length} characters</span>
+              <span className="text-[10px] text-muted-foreground">{jsonText.length} characters</span>
               {jsonText && (
-                <span className="text-[10px] text-[#9BA8C4]">
+                <span className="text-[10px] text-muted-foreground">
                   {(() => { try { const a = JSON.parse(jsonText.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')); return Array.isArray(a) ? `${a.length} objects detected` : 'object detected' } catch { return 'not valid JSON yet' } })()}
                 </span>
               )}
             </div>
 
             {parseError && (
-              <div className="flex items-start gap-2 px-4 py-3 rounded-lg mb-4 animate-slide-up" style={{ background: 'rgba(192,57,43,0.15)', border: '1px solid rgba(192,57,43,0.4)' }}>
-                <span className="text-base flex-shrink-0">⚠️</span>
-                <p className="text-xs text-[#FF8A80] leading-relaxed">{parseError}</p>
+              <div className="flex items-start gap-2 px-4 py-3 rounded-lg mb-4 animate-slide-up" style={{ background: 'color-mix(in oklab, var(--danger-solid) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--danger-solid) 40%, transparent)' }}>
+                <span className="text-base shrink-0">⚠️</span>
+                <p className="text-xs text-danger leading-relaxed">{parseError}</p>
               </div>
             )}
 
@@ -390,7 +390,7 @@ export function JsonImportPanel() {
               <button
                 onClick={() => setStep('prompt')}
                 className="px-5 py-3 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }}
+                style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }}
               >
                 ← Back
               </button>
@@ -398,7 +398,7 @@ export function JsonImportPanel() {
                 onClick={handleParse}
                 disabled={!jsonText.trim()}
                 className="flex-1 py-3 rounded-xl font-display text-xl tracking-widest transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+                style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
                 onMouseOver={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.opacity = '0.88' }}
                 onMouseOut={(e) => { e.currentTarget.style.opacity = '1' }}
               >
@@ -414,28 +414,28 @@ export function JsonImportPanel() {
             {/* Summary bar */}
             <div className="flex items-center gap-3 mb-5 flex-wrap">
               <div>
-                <h3 className="font-display text-xl tracking-widest text-[#F0EDD8]">Review Questions</h3>
-                <p className="text-xs text-[#9BA8C4] mt-0.5">
+                <h3 className="font-display text-xl tracking-widest text-foreground">Review Questions</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {validation.valid.length} valid · {validation.errors.length} error{validation.errors.length !== 1 ? 's' : ''} · {approved.size} selected
                 </p>
               </div>
               <div className="ml-auto flex gap-2">
-                <button onClick={approveAll} className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" style={{ background: 'rgba(26,138,74,0.15)', border: '1px solid rgba(26,138,74,0.35)', color: '#6DFFAA' }}>Select all</button>
-                <button onClick={rejectAll}  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" style={{ background: 'rgba(192,57,43,0.1)',  border: '1px solid rgba(192,57,43,0.3)',  color: '#FF8A80' }}>Deselect all</button>
+                <button onClick={approveAll} className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" style={{ background: 'color-mix(in oklab, var(--success-solid) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--success-solid) 35%, transparent)', color: 'var(--success)' }}>Select all</button>
+                <button onClick={rejectAll}  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" style={{ background: 'color-mix(in oklab, var(--danger-solid) 10%, transparent)',  border: '1px solid color-mix(in oklab, var(--danger-solid) 30%, transparent)',  color: 'var(--danger)' }}>Deselect all</button>
               </div>
             </div>
 
             {/* Saved confirmation */}
             {savedCount !== null && (
-              <div className="flex items-center gap-3 px-4 py-3.5 rounded-xl mb-5 animate-slide-up" style={{ background: 'rgba(26,138,74,0.15)', border: '1.5px solid rgba(26,138,74,0.5)' }}>
+              <div className="flex items-center gap-3 px-4 py-3.5 rounded-xl mb-5 animate-slide-up" style={{ background: 'color-mix(in oklab, var(--success-solid) 15%, transparent)', border: '1.5px solid color-mix(in oklab, var(--success-solid) 50%, transparent)' }}>
                 <span className="text-2xl">✅</span>
                 <div>
-                  <div className="font-semibold text-[#6DFFAA]">{savedCount} question{savedCount !== 1 ? 's' : ''} added to your bank!</div>
-                  <div className="text-xs text-[#9BA8C4] mt-0.5">Go to Browse to see and edit them.</div>
+                  <div className="font-semibold text-success">{savedCount} question{savedCount !== 1 ? 's' : ''} added to your bank!</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Go to Browse to see and edit them.</div>
                 </div>
                 <button onClick={() => { setStep('prompt'); setJsonText(''); setValidation(null); setSavedCount(null) }}
                   className="ml-auto px-3 py-1.5 rounded-lg text-xs font-semibold"
-                  style={{ background: 'rgba(245,200,66,0.15)', border: '1px solid rgba(245,200,66,0.3)', color: '#F5C842' }}>
+                  style={{ background: 'color-mix(in oklab, var(--primary) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)', color: 'var(--primary)' }}>
                   Import more
                 </button>
               </div>
@@ -443,15 +443,15 @@ export function JsonImportPanel() {
 
             {/* Validation errors */}
             {validation.errors.length > 0 && (
-              <div className="mb-4 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(192,57,43,0.35)' }}>
-                <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'rgba(192,57,43,0.15)' }}>
+              <div className="mb-4 rounded-xl overflow-hidden" style={{ border: '1px solid color-mix(in oklab, var(--danger-solid) 35%, transparent)' }}>
+                <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'color-mix(in oklab, var(--danger-solid) 15%, transparent)' }}>
                   <span>⚠️</span>
-                  <span className="text-xs font-semibold text-[#FF8A80]">{validation.errors.length} item{validation.errors.length !== 1 ? 's' : ''} could not be imported</span>
+                  <span className="text-xs font-semibold text-danger">{validation.errors.length} item{validation.errors.length !== 1 ? 's' : ''} could not be imported</span>
                 </div>
-                <div className="divide-y" style={{ borderColor: 'rgba(192,57,43,0.2)' }}>
+                <div className="divide-y" style={{ borderColor: 'color-mix(in oklab, var(--danger-solid) 20%, transparent)' }}>
                   {validation.errors.map((e, i) => (
                     <div key={i} className="px-4 py-2.5">
-                      <p className="text-[11px] text-[#FF8A80]">
+                      <p className="text-[11px] text-danger">
                         {e.index >= 0 ? `Item ${e.index + 1}: ` : ''}{e.message}
                       </p>
                     </div>
@@ -471,17 +471,17 @@ export function JsonImportPanel() {
                     onClick={() => toggleApprove(i)}
                     className="group flex items-start gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all"
                     style={{
-                      background: isApproved ? 'rgba(26,138,74,0.08)' : 'rgba(255,255,255,0.03)',
-                      border: `1.5px solid ${isApproved ? 'rgba(26,138,74,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                      background: isApproved ? 'color-mix(in oklab, var(--success-solid) 8%, transparent)' : 'color-mix(in oklab, var(--foreground) 3%, transparent)',
+                      border: `1.5px solid ${isApproved ? 'color-mix(in oklab, var(--success-solid) 40%, transparent)' : 'color-mix(in oklab, var(--foreground) 8%, transparent)'}`,
                     }}
                   >
                     {/* Checkbox */}
-                    <div className="flex-shrink-0 mt-0.5">
+                    <div className="shrink-0 mt-0.5">
                       <div
-                        className="w-5 h-5 rounded flex items-center justify-center transition-all"
+                        className="w-5 h-5 rounded-sm flex items-center justify-center transition-all"
                         style={isApproved
-                          ? { background: '#1A8A4A', border: '1.5px solid #1A8A4A' }
-                          : { background: 'transparent', border: '1.5px solid rgba(255,255,255,0.2)' }
+                          ? { background: 'var(--success-solid)', border: '1.5px solid var(--success-solid)' }
+                          : { background: 'transparent', border: '1.5px solid color-mix(in oklab, var(--foreground) 20%, transparent)' }
                         }
                       >
                         {isApproved && <span className="text-[10px] font-bold text-white">✓</span>}
@@ -492,44 +492,44 @@ export function JsonImportPanel() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                         <span className="text-sm">{catIcon(q.categoryId)}</span>
-                        <span className="text-[10px] text-[#9BA8C4]">{catLabel(q.categoryId)}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide"
+                        <span className="text-[10px] text-muted-foreground">{catLabel(q.categoryId)}</span>
+                        <span className="px-1.5 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide"
                           style={{ color: ds.color, background: ds.bg, border: `1px solid ${ds.border}` }}>
                           {q.difficulty}
                         </span>
                       </div>
 
-                      <p className="text-sm text-[#F0EDD8] font-medium leading-snug mb-1">{q.question}</p>
-                      <p className="text-xs text-[#9BA8C4] leading-snug">
-                        <span className="text-[#6DFFAA] font-semibold">A: </span>{q.answer}
+                      <p className="text-sm text-foreground font-medium leading-snug mb-1">{q.question}</p>
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        <span className="text-success font-semibold">A: </span>{q.answer}
                       </p>
 
                       {/* Category-specific detail */}
                       {q.verseRef && (
-                        <p className="text-[10px] text-[#9BA8C4] mt-1">📖 {q.verseRef}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">📖 {q.verseRef}</p>
                       )}
                       {q.book && q.chapter && q.verse && (
-                        <p className="text-[10px] text-[#9BA8C4] mt-1">📜 {q.book} {q.chapter}:{q.verse}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">📜 {q.book} {q.chapter}:{q.verse}</p>
                       )}
                       {q.isTrue !== undefined && (
-                        <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded"
-                          style={q.isTrue ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' } : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }}>
+                        <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-sm"
+                          style={q.isTrue ? { background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)', color: 'var(--success)' } : { background: 'color-mix(in oklab, var(--danger-solid) 20%, transparent)', color: 'var(--danger)' }}>
                           {q.isTrue ? 'TRUE' : 'FALSE'}
                         </span>
                       )}
                       {q.topicTag && (
                         <span className="inline-block mt-1 mr-1 px-2 py-0.5 rounded-full text-[9px] font-semibold"
-                          style={{ background: 'rgba(123,47,190,0.15)', border: '1px solid rgba(123,47,190,0.3)', color: '#C084FC' }}>
+                          style={{ background: 'color-mix(in oklab, var(--secondary) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 30%, transparent)', color: 'var(--secondary)' }}>
                           🏷️ {q.topicTag}
                         </span>
                       )}
                       {q.acceptableAnswers && q.acceptableAnswers.length > 0 && (
-                        <p className="text-[10px] text-[#9BA8C4] mt-1">{q.acceptableAnswers.length} acceptable answers</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">{q.acceptableAnswers.length} acceptable answers</p>
                       )}
                     </div>
 
                     {/* Approve/reject indicator */}
-                    <div className="flex-shrink-0 text-xs font-semibold" style={{ color: isApproved ? '#6DFFAA' : '#9BA8C4' }}>
+                    <div className="shrink-0 text-xs font-semibold" style={{ color: isApproved ? 'var(--success)' : 'var(--muted-foreground)' }}>
                       {isApproved ? 'Include' : 'Skip'}
                     </div>
                   </div>
@@ -539,12 +539,12 @@ export function JsonImportPanel() {
 
             {/* Save bar */}
             {savedCount === null && (
-              <div className="sticky bottom-0 pt-3 pb-1" style={{ background: 'linear-gradient(to top, #0A1628 70%, transparent)' }}>
+              <div className="sticky bottom-0 pt-3 pb-1" style={{ background: 'linear-gradient(to top, var(--background) 70%, transparent)' }}>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setStep('paste')}
                     className="px-5 py-3 rounded-xl text-sm font-semibold transition-all"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }}
+                    style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }}
                   >
                     ← Edit JSON
                   </button>
@@ -552,7 +552,7 @@ export function JsonImportPanel() {
                     onClick={handleSave}
                     disabled={approved.size === 0}
                     className="flex-1 py-3.5 rounded-xl font-display text-xl tracking-widest transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                    style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+                    style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
                     onMouseOver={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.opacity = '0.88' }}
                     onMouseOut={(e) => { e.currentTarget.style.opacity = '1' }}
                   >

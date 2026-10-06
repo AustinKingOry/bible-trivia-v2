@@ -6,10 +6,10 @@ import { CATEGORIES, ALL_TOPICS_TAG } from '@/lib/data'
 import type { Difficulty } from '@/types'
 
 const DIFFS: { id: Difficulty; label: string; color: string }[] = [
-  { id: 'all',    label: '⭐ All',    color: '#F5C842' },
-  { id: 'easy',   label: '🟢 Easy',   color: '#6DFFAA' },
-  { id: 'medium', label: '🟡 Medium', color: '#F5C842' },
-  { id: 'hard',   label: '🔴 Hard',   color: '#FF8A80' },
+  { id: 'all',    label: '⭐ All',    color: 'var(--primary)' },
+  { id: 'easy',   label: '🟢 Easy',   color: 'var(--success)' },
+  { id: 'medium', label: '🟡 Medium', color: 'var(--primary)' },
+  { id: 'hard',   label: '🔴 Hard',   color: 'var(--danger)' },
 ]
 
 interface Props { sessionId: string; onClose: () => void }
@@ -55,16 +55,16 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
     >
       <div
         className="panel w-full max-w-lg animate-slide-up overflow-y-auto"
-        style={{ border: '1.5px solid rgba(245,200,66,0.35)', maxHeight: '90vh' }}
+        style={{ border: '1.5px solid color-mix(in oklab, var(--primary) 35%, transparent)', maxHeight: '90vh' }}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display text-2xl tracking-widest text-[#F5C842]">ADD ROUND</h2>
-          <button onClick={onClose} className="text-[#9BA8C4] hover:text-white text-2xl transition-colors">×</button>
+          <h2 className="font-display text-2xl tracking-widest text-primary">ADD ROUND</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white text-2xl transition-colors">×</button>
         </div>
 
         {/* Round name */}
         <label className="block mb-4">
-          <span className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase block mb-1.5">
+          <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase block mb-1.5">
             Round Name (optional)
           </span>
           <input
@@ -72,20 +72,20 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={defaultName}
-            className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
+            className="w-full px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden"
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(245,200,66,0.25)',
+              background: 'color-mix(in oklab, var(--foreground) 6%, transparent)',
+              border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)',
               fontFamily: 'var(--font-body)',
             }}
-            onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
           />
         </label>
 
         {/* Question format */}
         <div className="mb-4">
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Question Format</div>
+          <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-2">Question Format</div>
           <div className="grid grid-cols-2 gap-2">
             {CATEGORIES.map((c) => (
               <button
@@ -93,12 +93,12 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
                 onClick={() => setCategoryId(c.id)}
                 className="text-left p-2.5 rounded-lg transition-all"
                 style={categoryId === c.id
-                  ? { background: 'rgba(245,200,66,0.12)', border: '1.5px solid #F5C842' }
-                  : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent' }
+                  ? { background: 'color-mix(in oklab, var(--primary) 12%, transparent)', border: '1.5px solid var(--primary)' }
+                  : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1.5px solid transparent' }
                 }
               >
                 <span className="mr-1.5">{c.icon}</span>
-                <span className="font-medium text-[#F0EDD8] text-xs">{c.name}</span>
+                <span className="font-medium text-foreground text-xs">{c.name}</span>
               </button>
             ))}
           </div>
@@ -106,9 +106,9 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
 
         {/* Topic / Subject filter */}
         <div className="mb-4">
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">
+          <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-2">
             Subject / Topic
-            <span className="ml-2 text-[#4A5568] normal-case font-normal">optional filter</span>
+            <span className="ml-2 text-subtle normal-case font-normal">optional filter</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {/* All topics option */}
@@ -116,8 +116,8 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
               onClick={() => setTopicTag(ALL_TOPICS_TAG)}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
               style={topicTag === ALL_TOPICS_TAG
-                ? { background: 'rgba(245,200,66,0.15)', border: '1.5px solid #F5C842', color: '#F5C842' }
-                : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent', color: '#9BA8C4' }
+                ? { background: 'color-mix(in oklab, var(--primary) 15%, transparent)', border: '1.5px solid var(--primary)', color: 'var(--primary)' }
+                : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1.5px solid transparent', color: 'var(--muted-foreground)' }
               }
             >
               🌐 All topics
@@ -128,8 +128,8 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
                 onClick={() => setTopicTag(t.tag)}
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
                 style={topicTag === t.tag
-                  ? { background: 'rgba(123,47,190,0.2)', border: '1.5px solid #7B2FBE', color: '#C084FC' }
-                  : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent', color: '#9BA8C4' }
+                  ? { background: 'color-mix(in oklab, var(--secondary) 20%, transparent)', border: '1.5px solid var(--secondary)', color: 'var(--secondary)' }
+                  : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1.5px solid transparent', color: 'var(--muted-foreground)' }
                 }
               >
                 <span>{t.emoji}</span> {t.label}
@@ -137,8 +137,8 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
             ))}
           </div>
           {topicTag !== ALL_TOPICS_TAG && (
-            <p className="text-[10px] text-[#9BA8C4] mt-1.5">
-              Only <span className="text-[#C084FC] font-semibold">{topicLabel}</span> questions will be used in this round.
+            <p className="text-[10px] text-muted-foreground mt-1.5">
+              Only <span className="text-secondary font-semibold">{topicLabel}</span> questions will be used in this round.
             </p>
           )}
         </div>
@@ -146,9 +146,9 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
         {/* Difficulty */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase">Difficulty</div>
+            <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">Difficulty</div>
             {difficulty === 'all' && (
-              <span className="text-[10px] text-[#F5C842]">All difficulties shuffled together</span>
+              <span className="text-[10px] text-primary">All difficulties shuffled together</span>
             )}
           </div>
           <div className="flex gap-2">
@@ -158,15 +158,15 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
                 onClick={() => setDifficulty(d.id)}
                 className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all"
                 style={difficulty === d.id
-                  ? { background: `${d.color}18`, border: `1.5px solid ${d.color}`, color: d.color }
-                  : { background: 'rgba(255,255,255,0.04)', border: '1.5px solid transparent', color: '#9BA8C4' }
+                  ? { background: `color-mix(in oklab, ${d.color} 9%, transparent)`, border: `1.5px solid ${d.color}`, color: d.color }
+                  : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1.5px solid transparent', color: 'var(--muted-foreground)' }
                 }
               >
                 {d.label}
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-[#9BA8C4] mt-1.5">
+          <p className="text-[10px] text-muted-foreground mt-1.5">
             {available} question{available !== 1 ? 's' : ''} available
             {difficulty === 'all' ? ' across all difficulties' : ''}
             {topicTag !== ALL_TOPICS_TAG ? ` · ${topicLabel} only` : ''}
@@ -175,7 +175,7 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
 
         {/* Question limit */}
         <label className="block mb-6">
-          <span className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase block mb-1.5">
+          <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase block mb-1.5">
             Question Limit (optional — leave blank to use all)
           </span>
           <input
@@ -185,14 +185,14 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
             value={questionLimit}
             onChange={(e) => setQuestionLimit(e.target.value)}
             placeholder={`Max ${available}`}
-            className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
+            className="w-full px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden"
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(245,200,66,0.25)',
+              background: 'color-mix(in oklab, var(--foreground) 6%, transparent)',
+              border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)',
               fontFamily: 'var(--font-body)',
             }}
-            onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
           />
         </label>
 
@@ -200,7 +200,7 @@ export function AddRoundModal({ sessionId, onClose }: Props) {
           onClick={handleCreate}
           disabled={available === 0}
           className="w-full py-3.5 rounded-lg font-display text-xl tracking-widest transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+          style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
           onMouseOver={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.opacity = '0.88' }}
           onMouseOut={(e) => { e.currentTarget.style.opacity = '1' }}
         >

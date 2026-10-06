@@ -15,12 +15,12 @@ export function showToast(message: string, type: ToastType = 'info') {
 }
 
 const STYLES: Record<ToastType, string> = {
-  correct: 'bg-emerald-900/90 border-emerald-500 text-emerald-100',
-  wrong:   'bg-red-900/90 border-red-500 text-red-100',
-  steal:   'bg-blue-900/90 border-blue-400 text-blue-100',
-  pass:    'bg-orange-900/90 border-orange-500 text-orange-100',
-  info:    'bg-[#142240]/95 border-[#F5C842]/40 text-[#F5C842]',
-  error:   'bg-red-950/90 border-red-700 text-red-300',
+  correct: 'bg-card border-success-solid text-success',
+  wrong:   'bg-card border-danger-solid text-danger',
+  steal:   'bg-card border-info text-info',
+  pass:    'bg-card border-secondary text-secondary',
+  info:    'bg-card border-primary/50 text-primary',
+  error:   'bg-card border-danger-solid text-danger',
 }
 
 export function Toast() {
@@ -36,11 +36,11 @@ export function Toast() {
   }, [])
 
   return (
-    <div className="fixed top-14 right-4 z-[200] flex flex-col gap-2 pointer-events-none">
+    <div className="fixed inset-x-4 top-[calc(env(safe-area-inset-top)+4rem)] z-[200] flex flex-col items-center gap-2 pointer-events-none md:inset-x-auto md:right-6 md:top-6 md:items-end">
       {toasts.map((t) => (
         <div key={t.id}
           className={`px-4 py-3 rounded-lg border font-semibold text-sm animate-toast-in ${STYLES[t.type]}`}
-          style={{ backdropFilter: 'blur(8px)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
+          style={{ backdropFilter: 'blur(8px)', boxShadow: '0 8px 24px color-mix(in oklab, black 25%, transparent)' }}>
           {t.message}
         </div>
       ))}

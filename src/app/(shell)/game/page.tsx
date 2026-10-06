@@ -24,9 +24,9 @@ export default function GameHomePage() {
   }
 
   const statusColor: Record<string, string> = {
-    setup: 'text-[#9BA8C4]',
-    active: 'text-[#6DFFAA]',
-    ended: 'text-[#F5C842]',
+    setup: 'text-muted-foreground',
+    active: 'text-success',
+    ended: 'text-primary',
   }
   const statusLabel: Record<string, string> = {
     setup: 'Setup',
@@ -38,11 +38,11 @@ export default function GameHomePage() {
     <div className="flex flex-col h-full">
       {/* Page header */}
       <div
-        className="border-b px-6 py-4 flex-shrink-0"
-        style={{ borderColor: 'rgba(245,200,66,0.18)', background: 'linear-gradient(135deg,#142240,#0D1E38)' }}
+        className="border-b px-6 py-4 shrink-0"
+        style={{ borderColor: 'color-mix(in oklab, var(--primary) 18%, transparent)', background: 'linear-gradient(135deg,var(--card),var(--sidebar))' }}
       >
         <h1 className="font-display text-2xl tracking-widest text-gold-glow">SESSIONS</h1>
-        <p className="text-[#9BA8C4] text-xs tracking-wide mt-0.5">
+        <p className="text-muted-foreground text-xs tracking-wide mt-0.5">
           {sessionList.length} session{sessionList.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -50,7 +50,7 @@ export default function GameHomePage() {
       <div className="flex-1 overflow-y-auto px-6 py-6 max-w-2xl w-full mx-auto">
         {/* Create new */}
         <div className="panel mb-6">
-          <h2 className="font-display text-lg tracking-widest text-[#F5C842] mb-3">NEW SESSION</h2>
+          <h2 className="font-display text-lg tracking-widest text-primary mb-3">NEW SESSION</h2>
           <div className="flex gap-3">
             <input
               type="text"
@@ -58,19 +58,19 @@ export default function GameHomePage() {
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               placeholder="e.g. Youth Night – Week 3"
-              className="flex-1 px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
+              className="flex-1 px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden"
               style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(245,200,66,0.25)',
+                background: 'color-mix(in oklab, var(--foreground) 6%, transparent)',
+                border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)',
                 fontFamily: 'var(--font-body)',
               }}
-              onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-              onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+              onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+              onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
             />
             <button
               onClick={handleCreate}
               className="px-5 py-2.5 rounded-lg font-display text-lg tracking-wider transition-all"
-              style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+              style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
               onMouseOver={(e) => (e.currentTarget.style.opacity = '0.88')}
               onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
             >
@@ -81,30 +81,30 @@ export default function GameHomePage() {
 
         {/* Sessions list */}
         {sessionList.length === 0 ? (
-          <div className="text-center py-16 text-[#9BA8C4]">
+          <div className="text-center py-16 text-muted-foreground">
             <div className="text-5xl mb-4">✝️</div>
-            <p className="text-lg font-semibold mb-1 text-[#F0EDD8]">No sessions yet</p>
+            <p className="text-lg font-semibold mb-1 text-foreground">No sessions yet</p>
             <p className="text-sm">Create your first session above to get started.</p>
           </div>
         ) : (
           <>
-            <h2 className="font-display text-lg tracking-widest text-[#F5C842] mb-3">SESSIONS</h2>
+            <h2 className="font-display text-lg tracking-widest text-primary mb-3">SESSIONS</h2>
             <div className="flex flex-col gap-2.5">
               {sessionList.map((s) => (
                 <div
                   key={s.id}
                   className="panel flex items-center gap-4 cursor-pointer transition-all animate-fade-in"
-                  style={{ borderColor: s.status === 'active' ? 'rgba(26,138,74,0.5)' : undefined }}
+                  style={{ borderColor: s.status === 'active' ? 'color-mix(in oklab, var(--success-solid) 50%, transparent)' : undefined }}
                   onClick={() => handleOpen(s.id)}
-                  onMouseOver={(e) => (e.currentTarget.style.borderColor = 'rgba(245,200,66,0.45)')}
+                  onMouseOver={(e) => (e.currentTarget.style.borderColor = 'color-mix(in oklab, var(--primary) 45%, transparent)')}
                   onMouseOut={(e) =>
                     (e.currentTarget.style.borderColor =
-                      s.status === 'active' ? 'rgba(26,138,74,0.5)' : 'rgba(245,200,66,0.18)')
+                      s.status === 'active' ? 'color-mix(in oklab, var(--success-solid) 50%, transparent)' : 'color-mix(in oklab, var(--primary) 18%, transparent)')
                   }
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-[#F0EDD8] truncate">{s.name}</div>
-                    <div className="text-xs text-[#9BA8C4] mt-0.5">
+                    <div className="font-semibold text-foreground truncate">{s.name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
                       {new Date(s.createdAt).toLocaleDateString('en-GB', {
                         day: 'numeric', month: 'short', year: 'numeric',
                       })}
@@ -118,7 +118,7 @@ export default function GameHomePage() {
                       e.stopPropagation()
                       if (confirm(`Delete "${s.name}"? This cannot be undone.`)) deleteSession(s.id)
                     }}
-                    className="text-[#9BA8C4] hover:text-red-400 text-xl px-1 transition-colors flex-shrink-0"
+                    className="text-muted-foreground hover:text-red-400 text-xl px-1 transition-colors shrink-0"
                   >
                     ×
                   </button>

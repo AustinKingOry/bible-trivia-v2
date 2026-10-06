@@ -18,9 +18,9 @@ interface Props {
 }
 
 const DIFF_OPTIONS: { id: Difficulty; label: string; color: string }[] = [
-  { id: 'easy',   label: 'Easy',   color: '#6DFFAA' },
-  { id: 'medium', label: 'Medium', color: '#F5C842' },
-  { id: 'hard',   label: 'Hard',   color: '#FF8A80' },
+  { id: 'easy',   label: 'Easy',   color: 'var(--success)' },
+  { id: 'medium', label: 'Medium', color: 'var(--primary)' },
+  { id: 'hard',   label: 'Hard',   color: 'var(--danger)' },
 ]
 
 export interface FormPayload {
@@ -86,8 +86,8 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
       <div
         className="fixed right-0 top-0 bottom-0 z-50 flex flex-col w-full max-w-lg animate-slide-up"
         style={{
-          background: '#0D1E38',
-          borderLeft: '1px solid rgba(245,200,66,0.25)',
+          background: 'var(--sidebar)',
+          borderLeft: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)',
           boxShadow: '-8px 0 40px rgba(0,0,0,0.5)',
           animationName: 'drawerIn',
         }}
@@ -101,24 +101,24 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
 
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
-          style={{ borderColor: 'rgba(245,200,66,0.18)' }}
+          className="flex items-center justify-between px-6 py-4 border-b shrink-0"
+          style={{ borderColor: 'color-mix(in oklab, var(--primary) 18%, transparent)' }}
         >
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xl">{category.icon}</span>
-              <h2 className="font-display text-xl tracking-widest text-[#F5C842]">
+              <h2 className="font-display text-xl tracking-widest text-primary">
                 {isEditing ? 'EDIT QUESTION' : 'ADD QUESTION'}
               </h2>
             </div>
-            <p className="text-[11px] text-[#9BA8C4] mt-0.5">{category.name}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{category.name}</p>
           </div>
-          <button onClick={onClose} className="text-[#9BA8C4] hover:text-white text-2xl transition-colors">×</button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-white text-2xl transition-colors">×</button>
         </div>
 
         {/* Difficulty selector */}
-        <div className="px-6 py-3 border-b flex-shrink-0" style={{ borderColor: 'rgba(245,200,66,0.1)' }}>
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Difficulty</div>
+        <div className="px-6 py-3 border-b shrink-0" style={{ borderColor: 'color-mix(in oklab, var(--primary) 10%, transparent)' }}>
+          <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-2">Difficulty</div>
           <div className="flex gap-2">
             {DIFF_OPTIONS.map((d) => (
               <button
@@ -127,8 +127,8 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
                 className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
                 style={
                   difficulty === d.id
-                    ? { color: d.color, border: `1.5px solid ${d.color}`, background: `${d.color}18` }
-                    : { color: '#9BA8C4', border: '1.5px solid transparent', background: 'rgba(255,255,255,0.04)' }
+                    ? { color: d.color, border: `1.5px solid ${d.color}`, background: `color-mix(in oklab, ${d.color} 9%, transparent)` }
+                    : { color: 'var(--muted-foreground)', border: '1.5px solid transparent', background: 'color-mix(in oklab, var(--foreground) 4%, transparent)' }
                 }
               >
                 {d.label}
@@ -141,7 +141,7 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {/* Topic tag picker */}
           <div className="mb-4">
-            <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2">Subject / Topic</div>
+            <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-2">Subject / Topic</div>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {allTopics.map((t) => {
                 const active = payload.topicTag === t.tag
@@ -152,8 +152,8 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
                     onClick={() => setPayload((p) => ({ ...p, topicTag: t.tag }))}
                     className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
                     style={active
-                      ? { background: 'rgba(245,200,66,0.18)', border: '1.5px solid #F5C842', color: '#F5C842' }
-                      : { background: 'rgba(255,255,255,0.05)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }
+                      ? { background: 'color-mix(in oklab, var(--primary) 18%, transparent)', border: '1.5px solid var(--primary)', color: 'var(--primary)' }
+                      : { background: 'color-mix(in oklab, var(--foreground) 5%, transparent)', border: '1.5px solid color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }
                     }
                   >
                     <span>{t.emoji}</span> {t.label}
@@ -170,10 +170,10 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
 
           {/* Hint banner */}
           <div
-            className="flex items-start gap-2 px-3 py-2.5 rounded-lg mb-4 text-xs text-[#9BA8C4]"
-            style={{ background: 'rgba(245,200,66,0.06)', border: '1px solid rgba(245,200,66,0.15)' }}
+            className="flex items-start gap-2 px-3 py-2.5 rounded-lg mb-4 text-xs text-muted-foreground"
+            style={{ background: 'color-mix(in oklab, var(--primary) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 15%, transparent)' }}
           >
-            <span className="text-base flex-shrink-0">💡</span>
+            <span className="text-base shrink-0">💡</span>
             <span>{category.addHint}</span>
           </div>
 
@@ -182,13 +182,13 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
 
         {/* Footer */}
         <div
-          className="px-6 py-4 border-t flex gap-3 flex-shrink-0"
-          style={{ borderColor: 'rgba(245,200,66,0.15)' }}
+          className="px-6 py-4 border-t flex gap-3 shrink-0"
+          style={{ borderColor: 'color-mix(in oklab, var(--primary) 15%, transparent)' }}
         >
           <button
             onClick={onClose}
             className="flex-1 py-3 rounded-lg text-sm font-semibold transition-all"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }}
+            style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }}
           >
             Cancel
           </button>
@@ -197,8 +197,8 @@ export function AddQuestionDrawer({ category, editingQuestion, onClose }: Props)
             disabled={!canSave}
             className="flex-2 px-8 py-3 rounded-lg font-display text-lg tracking-widest transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
-              background: saved ? '#1A8A4A' : 'linear-gradient(135deg,#F5C842,#C49A10)',
-              color: '#0A1628',
+              background: saved ? 'var(--success-solid)' : 'linear-gradient(135deg,var(--primary),var(--primary-strong))',
+              color: 'var(--background)',
               flex: 2,
             }}
           >
@@ -244,10 +244,10 @@ function CustomTopicInput({
         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (isNewTag) handleAdd() } }}
         placeholder="Add custom topic…"
         maxLength={32}
-        className="flex-1 px-3 py-1.5 rounded-lg text-xs text-[#F0EDD8] outline-none"
+        className="flex-1 px-3 py-1.5 rounded-lg text-xs text-foreground outline-hidden"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'color-mix(in oklab, var(--foreground) 5%, transparent)',
+          border: '1px solid color-mix(in oklab, var(--foreground) 10%, transparent)',
           fontFamily: 'var(--font-body)',
         }}
       />
@@ -258,15 +258,15 @@ function CustomTopicInput({
             value={emoji}
             onChange={(e) => setEmoji(e.target.value || '🏷️')}
             maxLength={4}
-            className="w-10 text-center px-1 py-1.5 rounded-lg text-base outline-none"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+            className="w-10 text-center px-1 py-1.5 rounded-lg text-base outline-hidden"
+            style={{ background: 'color-mix(in oklab, var(--foreground) 5%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 10%, transparent)' }}
             title="Pick an emoji"
           />
           <button
             type="button"
             onClick={handleAdd}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-            style={{ background: 'rgba(245,200,66,0.18)', border: '1px solid rgba(245,200,66,0.35)', color: '#F5C842' }}
+            style={{ background: 'color-mix(in oklab, var(--primary) 18%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 35%, transparent)', color: 'var(--primary)' }}
           >
             + Add
           </button>

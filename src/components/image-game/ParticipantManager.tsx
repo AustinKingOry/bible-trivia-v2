@@ -45,7 +45,7 @@ export function ParticipantManager({ sessionId }: Props) {
     <div className="flex flex-col gap-4">
       {/* Add form */}
       <div className="panel">
-        <h3 className="font-display text-lg tracking-widest text-[#F5C842] mb-3">
+        <h3 className="font-display text-lg tracking-widest text-primary mb-3">
           ADD {isTeam ? 'TEAM' : 'PARTICIPANT'}
         </h3>
         <div className="flex gap-2 mb-3">
@@ -55,15 +55,15 @@ export function ParticipantManager({ sessionId }: Props) {
             onKeyDown={(e) => e.key === 'Enter' && !isTeam && handleAdd()}
             placeholder={isTeam ? 'Team name…' : 'Participant name…'}
             maxLength={32}
-            className="flex-1 px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(245,200,66,0.25)', fontFamily: 'var(--font-body)' }}
-            onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-            onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+            className="flex-1 px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden"
+            style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)', fontFamily: 'var(--font-body)' }}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
           />
           {!isTeam && (
             <button onClick={handleAdd}
               className="px-4 py-2.5 rounded-lg font-bold text-lg"
-              style={{ background: '#F5C842', color: '#0A1628' }}>+</button>
+              style={{ background: 'var(--primary)', color: 'var(--background)' }}>+</button>
           )}
         </div>
         {isTeam && (
@@ -72,14 +72,14 @@ export function ParticipantManager({ sessionId }: Props) {
               type="text" value={members}
               onChange={(e) => setMembers(e.target.value)}
               placeholder="Members (comma-separated, optional)"
-              className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none mb-3"
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(245,200,66,0.25)', fontFamily: 'var(--font-body)' }}
-              onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-              onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+              className="w-full px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden mb-3"
+              style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)', fontFamily: 'var(--font-body)' }}
+              onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+              onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
             />
             <button onClick={handleAdd}
               className="w-full py-2.5 rounded-lg font-display text-lg tracking-wider"
-              style={{ background: '#F5C842', color: '#0A1628' }}>
+              style={{ background: 'var(--primary)', color: 'var(--background)' }}>
               ADD TEAM
             </button>
           </>
@@ -88,16 +88,16 @@ export function ParticipantManager({ sessionId }: Props) {
 
       {/* Participant list */}
       {session.participants.length === 0 ? (
-        <div className="text-center py-10 text-[#9BA8C4]">
+        <div className="text-center py-10 text-muted-foreground">
           <div className="text-4xl mb-3">{isTeam ? '👥' : '👤'}</div>
-          <p className="font-semibold text-[#F0EDD8] mb-1">No {isTeam ? 'teams' : 'participants'} yet</p>
+          <p className="font-semibold text-foreground mb-1">No {isTeam ? 'teams' : 'participants'} yet</p>
           <p className="text-sm">Add {isTeam ? 'a team' : 'a participant'} above to get started.</p>
         </div>
       ) : (
         <div>
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-2 flex items-center gap-2">
+          <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-2 flex items-center gap-2">
             <span>{session.participants.length} {isTeam ? 'teams' : 'participants'}</span>
-            <span className="text-[#4A5568]">· drag to reorder queue</span>
+            <span className="text-subtle">· drag to reorder queue</span>
           </div>
           <div className="flex flex-col gap-2">
             {session.participants.map((p, i) => (
@@ -110,10 +110,10 @@ export function ParticipantManager({ sessionId }: Props) {
                 onDragEnd={() => { setDragging(null); setDragOver(null) }}
                 className="rounded-xl p-3 transition-all"
                 style={{
-                  background: dragOver === i ? 'rgba(245,200,66,0.08)' : 'rgba(255,255,255,0.04)',
+                  background: dragOver === i ? 'color-mix(in oklab, var(--primary) 8%, transparent)' : 'color-mix(in oklab, var(--foreground) 4%, transparent)',
                   border: dragOver === i
-                    ? '1.5px solid rgba(245,200,66,0.4)'
-                    : '1px solid rgba(255,255,255,0.08)',
+                    ? '1.5px solid color-mix(in oklab, var(--primary) 40%, transparent)'
+                    : '1px solid color-mix(in oklab, var(--foreground) 8%, transparent)',
                   cursor: 'grab',
                   opacity: dragging === i ? 0.45 : 1,
                 }}
@@ -123,55 +123,55 @@ export function ParticipantManager({ sessionId }: Props) {
                     <input autoFocus value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(p.id); if (e.key === 'Escape') setEditingId(null) }}
-                      className="w-full px-2.5 py-1.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
-                      style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid #F5C842', fontFamily: 'var(--font-body)' }} />
+                      className="w-full px-2.5 py-1.5 rounded-lg text-sm text-foreground outline-hidden"
+                      style={{ background: 'color-mix(in oklab, var(--foreground) 8%, transparent)', border: '1px solid var(--primary)', fontFamily: 'var(--font-body)' }} />
                     {isTeam && (
                       <input value={editMembers}
                         onChange={(e) => setEditMembers(e.target.value)}
                         placeholder="Members (comma-separated)"
-                        className="w-full px-2.5 py-1.5 rounded-lg text-xs text-[#F0EDD8] outline-none"
-                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(245,200,66,0.3)', fontFamily: 'var(--font-body)' }} />
+                        className="w-full px-2.5 py-1.5 rounded-lg text-xs text-foreground outline-hidden"
+                        style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)', fontFamily: 'var(--font-body)' }} />
                     )}
                     <div className="flex gap-2">
                       <button onClick={() => handleSaveEdit(p.id)}
-                        className="px-3 py-1 rounded text-xs font-bold text-[#6DFFAA]"
-                        style={{ background: 'rgba(26,138,74,0.2)' }}>✓ Save</button>
+                        className="px-3 py-1 rounded-sm text-xs font-bold text-success"
+                        style={{ background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)' }}>✓ Save</button>
                       <button onClick={() => setEditingId(null)}
-                        className="px-3 py-1 rounded text-xs text-[#9BA8C4]"
-                        style={{ background: 'rgba(255,255,255,0.06)' }}>Cancel</button>
+                        className="px-3 py-1 rounded-sm text-xs text-muted-foreground"
+                        style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)' }}>Cancel</button>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
                     {/* Drag handle */}
-                    <span className="text-[#4A5568] text-base select-none flex-shrink-0">⠿</span>
+                    <span className="text-subtle text-base select-none shrink-0">⠿</span>
                     {/* Queue position */}
                     <span className="font-display text-lg min-w-[24px] text-center"
-                      style={{ color: i === 0 ? '#F5C842' : '#9BA8C4' }}>{i + 1}</span>
-                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                      style={{ color: i === 0 ? 'var(--primary)' : 'var(--muted-foreground)' }}>{i + 1}</span>
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: p.color }} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-sm text-[#F0EDD8] truncate">{p.name}</div>
+                      <div className="font-semibold text-sm text-foreground truncate">{p.name}</div>
                       {p.members && p.members.length > 0 && (
-                        <div className="text-[10px] text-[#9BA8C4] mt-0.5 truncate">
+                        <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
                           {p.members.join(', ')}
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="font-display text-lg text-[#F5C842]">{p.score}</span>
-                      <span className="text-[9px] text-[#9BA8C4]">pts</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-display text-lg text-primary">{p.score}</span>
+                      <span className="text-[9px] text-muted-foreground">pts</span>
                       <button onClick={() => { setEditingId(p.id); setEditName(p.name); setEditMembers(p.members?.join(', ') ?? '') }}
-                        className="text-[#9BA8C4] hover:text-[#F5C842] text-xs font-semibold transition-colors px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(255,255,255,0.06)' }}>✎</button>
+                        className="text-muted-foreground hover:text-primary text-xs font-semibold transition-colors px-1.5 py-0.5 rounded-sm"
+                        style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)' }}>✎</button>
                       <button onClick={() => { if (confirm(`Remove "${p.name}"?`)) removeParticipant(sessionId, p.id) }}
-                        className="text-[#9BA8C4] hover:text-red-400 text-lg transition-colors">×</button>
+                        className="text-muted-foreground hover:text-red-400 text-lg transition-colors">×</button>
                     </div>
                   </div>
                 )}
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-[#4A5568] mt-3 text-center">
+          <p className="text-[10px] text-subtle mt-3 text-center">
             Queue order determines who answers first. Rotates automatically after each image.
           </p>
         </div>

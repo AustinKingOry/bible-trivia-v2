@@ -28,7 +28,7 @@ export function QuestionPanel({
 }: Props) {
   if (!question || !cat) {
     return (
-      <div className="panel-gold flex items-center justify-center py-16 text-[#9BA8C4]">
+      <div className="panel-gold flex items-center justify-center py-16 text-muted-foreground">
         No more questions in this round.
       </div>
     )
@@ -36,23 +36,23 @@ export function QuestionPanel({
 
   const isStealPhase = phase === 'steal-offered' || phase === 'team2-answering'
   const isDone = phase === 'done'
-  const borderColor = isStealPhase ? '#2E86DE' : isDone ? 'rgba(245,200,66,0.4)' : '#F5C842'
+  const borderColor = isStealPhase ? 'var(--info)' : isDone ? 'color-mix(in oklab, var(--primary) 40%, transparent)' : 'var(--primary)'
   const showTimerBar = timeLeft > 0 && phase !== 'steal-offered'
 
   return (
     <div
       className="flex flex-col gap-4 rounded-xl p-5 transition-all"
       style={{
-        background: '#142240',
+        background: 'var(--card)',
         border: `2px solid ${borderColor}`,
-        boxShadow: isStealPhase ? '0 0 28px rgba(46,134,222,0.2)' : undefined,
+        boxShadow: isStealPhase ? '0 0 28px color-mix(in oklab, var(--info) 20%, transparent)' : undefined,
       }}
     >
       {/* Meta row */}
       <div className="flex items-center gap-2 flex-wrap">
         <span
           className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase"
-          style={{ background: 'rgba(123,47,190,0.18)', border: '1px solid rgba(123,47,190,0.4)', color: '#C084FC' }}
+          style={{ background: 'color-mix(in oklab, var(--secondary) 18%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 40%, transparent)', color: 'var(--secondary)' }}
         >
           {cat.icon} {cat.name}
         </span>
@@ -62,7 +62,7 @@ export function QuestionPanel({
         </span>
         {topicLabel && (
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase"
-            style={{ background: 'rgba(123,47,190,0.15)', border: '1px solid rgba(123,47,190,0.35)', color: '#C084FC' }}>
+            style={{ background: 'color-mix(in oklab, var(--secondary) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 35%, transparent)', color: 'var(--secondary)' }}>
             {topicLabel.emoji} {topicLabel.label}
           </span>
         )}
@@ -70,23 +70,23 @@ export function QuestionPanel({
         {/* Phase badge inside card */}
         {phase === 'steal-offered' && (
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase animate-pulse"
-            style={{ background: 'rgba(46,134,222,0.2)', border: '1px solid rgba(46,134,222,0.5)', color: '#74B9FF' }}>
+            style={{ background: 'color-mix(in oklab, var(--info) 20%, transparent)', border: '1px solid color-mix(in oklab, var(--info) 50%, transparent)', color: 'var(--info)' }}>
             ⚡ Steal available
           </span>
         )}
         {phase === 'team2-answering' && (
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase"
-            style={{ background: 'rgba(46,134,222,0.25)', border: '1px solid rgba(46,134,222,0.6)', color: '#74B9FF' }}>
+            style={{ background: 'color-mix(in oklab, var(--info) 25%, transparent)', border: '1px solid color-mix(in oklab, var(--info) 60%, transparent)', color: 'var(--info)' }}>
             ⚡ Steal attempt
           </span>
         )}
 
-        <span className="ml-auto text-xs text-[#9BA8C4]">Q {qIdx} / {qTotal}</span>
+        <span className="ml-auto text-xs text-muted-foreground">Q {qIdx} / {qTotal}</span>
       </div>
 
       {/* Timer bar — hidden during steal-offered (no countdown running) */}
       {showTimerBar && (
-        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'color-mix(in oklab, var(--foreground) 8%, transparent)' }}>
           <div
             className="h-full rounded-full timer-bar"
             style={{ width: `${timerPct}%`, background: timerColor }}
@@ -95,17 +95,17 @@ export function QuestionPanel({
       )}
 
       {/* Question text */}
-      <p className="text-xl font-medium leading-relaxed text-[#F0EDD8] min-h-[72px]">
+      <p className="text-xl font-medium leading-relaxed text-foreground min-h-[72px]">
         {question.question}
       </p>
 
       {/* Answer section */}
       {answerRevealed ? (
         <div className="animate-slide-up">
-          <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-1.5">Answer</div>
+          <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-1.5">Answer</div>
           <div
-            className="px-4 py-3 rounded-lg text-base font-semibold text-[#6DFFAA]"
-            style={{ background: 'rgba(26,138,74,0.15)', border: '1px solid rgba(26,138,74,0.4)' }}
+            className="px-4 py-3 rounded-lg text-base font-semibold text-success"
+            style={{ background: 'color-mix(in oklab, var(--success-solid) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--success-solid) 40%, transparent)' }}
           >
             {question.answer}
           </div>
@@ -114,22 +114,22 @@ export function QuestionPanel({
           {question.trueFalseFields && (
             <div className="mt-2 flex items-center gap-2">
               <span
-                className="px-3 py-1 rounded font-display text-base tracking-wide"
+                className="px-3 py-1 rounded-sm font-display text-base tracking-wide"
                 style={question.trueFalseFields.isTrue
-                  ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' }
-                  : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }}
+                  ? { background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)', color: 'var(--success)' }
+                  : { background: 'color-mix(in oklab, var(--danger-solid) 20%, transparent)', color: 'var(--danger)' }}
               >
                 {question.trueFalseFields.isTrue ? 'TRUE' : 'FALSE'}
               </span>
               {question.trueFalseFields.explanation && (
-                <span className="text-xs text-[#9BA8C4]">{question.trueFalseFields.explanation}</span>
+                <span className="text-xs text-muted-foreground">{question.trueFalseFields.explanation}</span>
               )}
             </div>
           )}
 
           {/* Open verse detail */}
           {question.openVerseFields && (
-            <div className="mt-2 text-xs text-[#9BA8C4]">
+            <div className="mt-2 text-xs text-muted-foreground">
               📜 {question.openVerseFields.book} {question.openVerseFields.chapter}:{question.openVerseFields.verse}
             </div>
           )}
@@ -138,9 +138,9 @@ export function QuestionPanel({
         <button
           onClick={onReveal}
           className="self-start px-5 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-all"
-          style={{ background: 'rgba(26,138,74,0.1)', border: '1.5px solid rgba(26,138,74,0.4)', color: '#6DFFAA' }}
-          onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(26,138,74,0.25)')}
-          onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(26,138,74,0.1)')}
+          style={{ background: 'color-mix(in oklab, var(--success-solid) 10%, transparent)', border: '1.5px solid color-mix(in oklab, var(--success-solid) 40%, transparent)', color: 'var(--success)' }}
+          onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--success-solid) 25%, transparent)')}
+          onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--success-solid) 10%, transparent)')}
         >
           REVEAL ANSWER
         </button>

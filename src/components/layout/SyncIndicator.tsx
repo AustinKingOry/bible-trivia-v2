@@ -14,10 +14,10 @@ export function SyncIndicator() {
   if (!isConfigured || !authConfigured) {
     return (
       <div className="px-3 py-2.5 mx-2 mb-2 rounded-lg hidden lg:block"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="text-[9px] text-[#9BA8C4] uppercase tracking-widest mb-1 font-semibold">Cloud Sync</div>
-        <div className="text-[10px] text-[#9BA8C4]">Not configured</div>
-        <div className="text-[9px] text-[#4A5568] mt-0.5">Add Supabase keys to .env.local</div>
+        style={{ background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 8%, transparent)' }}>
+        <div className="text-[9px] text-muted-foreground uppercase tracking-widest mb-1 font-semibold">Cloud Sync</div>
+        <div className="text-[10px] text-muted-foreground">Not configured</div>
+        <div className="text-[9px] text-subtle mt-0.5">Add Supabase keys to .env.local</div>
       </div>
     )
   }
@@ -25,8 +25,8 @@ export function SyncIndicator() {
   // Auth loading
   if (authLoading) return (
     <div className="px-2 pb-3 hidden lg:block">
-      <div className="px-3 py-2.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="text-[9px] text-[#9BA8C4] animate-pulse">Checking auth…</div>
+      <div className="px-3 py-2.5 rounded-lg" style={{ background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 8%, transparent)' }}>
+        <div className="text-[9px] text-muted-foreground animate-pulse">Checking auth…</div>
       </div>
     </div>
   )
@@ -38,20 +38,20 @@ export function SyncIndicator() {
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
         <div className="px-2 pb-3 hidden lg:block">
           <div className="px-3 py-3 rounded-lg flex flex-col gap-2"
-            style={{ background: 'rgba(245,200,66,0.06)', border: '1px solid rgba(245,200,66,0.2)' }}>
+            style={{ background: 'color-mix(in oklab, var(--primary) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}>
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#9BA8C4]" />
-              <span className="text-[10px] font-semibold text-[#9BA8C4]">Not signed in</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+              <span className="text-[10px] font-semibold text-muted-foreground">Not signed in</span>
             </div>
-            <p className="text-[9px] text-[#4A5568] leading-relaxed">
+            <p className="text-[9px] text-subtle leading-relaxed">
               Sign in to sync questions, sessions and settings to the cloud.
             </p>
             <button
               onClick={() => setShowAuth(true)}
               className="w-full py-1.5 rounded-lg text-[10px] font-bold tracking-wide transition-all"
-              style={{ background: 'rgba(245,200,66,0.18)', border: '1px solid rgba(245,200,66,0.4)', color: '#F5C842' }}
-              onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(245,200,66,0.3)')}
-              onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(245,200,66,0.18)')}
+              style={{ background: 'color-mix(in oklab, var(--primary) 18%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 40%, transparent)', color: 'var(--primary)' }}
+              onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--primary) 30%, transparent)')}
+              onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--primary) 18%, transparent)')}
             >
               Sign In / Register
             </button>
@@ -63,10 +63,10 @@ export function SyncIndicator() {
 
   // Signed in — show sync status
   const statusConfig = {
-    idle:    { dot: '#9BA8C4', label: 'Ready',    pulse: false },
-    syncing: { dot: '#F5C842', label: 'Syncing…', pulse: true  },
-    ok:      { dot: '#6DFFAA', label: 'Synced',   pulse: false },
-    error:   { dot: '#FF8A80', label: 'Error',    pulse: false },
+    idle:    { dot: 'var(--muted-foreground)', label: 'Ready',    pulse: false },
+    syncing: { dot: 'var(--primary)', label: 'Syncing…', pulse: true  },
+    ok:      { dot: 'var(--success)', label: 'Synced',   pulse: false },
+    error:   { dot: 'var(--danger)', label: 'Error',    pulse: false },
   }[status]
 
   const timeLabel = (() => {
@@ -85,17 +85,17 @@ export function SyncIndicator() {
   return (
     <div className="px-2 pb-3 hidden lg:block">
       <div className="px-3 py-2.5 rounded-lg flex flex-col gap-1.5"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        style={{ background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 8%, transparent)' }}>
 
         {/* User row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#6DFFAA]" />
-            <span className="text-[9px] text-[#6DFFAA] font-semibold truncate">{emailShort}</span>
+            <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-success" />
+            <span className="text-[9px] text-success font-semibold truncate">{emailShort}</span>
           </div>
           <button
             onClick={() => signOut()}
-            className="text-[9px] text-[#9BA8C4] hover:text-red-400 transition-colors flex-shrink-0 ml-1"
+            className="text-[9px] text-muted-foreground hover:text-red-400 transition-colors shrink-0 ml-1"
             title="Sign out"
           >
             out
@@ -106,7 +106,7 @@ export function SyncIndicator() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span
-              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              className="w-1.5 h-1.5 rounded-full shrink-0"
               style={{
                 background: statusConfig.dot,
                 boxShadow: statusConfig.pulse ? `0 0 6px ${statusConfig.dot}` : undefined,
@@ -121,26 +121,26 @@ export function SyncIndicator() {
             onClick={syncNow}
             disabled={status === 'syncing'}
             className="text-[9px] font-semibold transition-colors disabled:opacity-40"
-            style={{ color: '#F5C842' }}
+            style={{ color: 'var(--primary)' }}
             title="Sync now"
           >
             {status === 'syncing' ? '…' : '↑↓'}
           </button>
         </div>
 
-        <div className="text-[9px] text-[#4A5568]">{timeLabel}</div>
+        <div className="text-[9px] text-subtle">{timeLabel}</div>
 
         {/* Pending count */}
         {dirtyCount > 0 && (
           <div className="flex items-center justify-between mt-0.5">
-            <span className="text-[9px] text-[#F5C842]">{dirtyCount} pending</span>
+            <span className="text-[9px] text-primary">{dirtyCount} pending</span>
             <button
               onClick={syncNow}
               disabled={status === 'syncing'}
-              className="text-[9px] px-1.5 py-0.5 rounded font-semibold disabled:opacity-40"
-              style={{ background: 'rgba(245,200,66,0.15)', color: '#F5C842' }}
-              onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(245,200,66,0.28)')}
-              onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(245,200,66,0.15)')}
+              className="text-[9px] px-1.5 py-0.5 rounded-sm font-semibold disabled:opacity-40"
+              style={{ background: 'color-mix(in oklab, var(--primary) 15%, transparent)', color: 'var(--primary)' }}
+              onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--primary) 28%, transparent)')}
+              onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--primary) 15%, transparent)')}
             >
               Sync now
             </button>
@@ -148,7 +148,7 @@ export function SyncIndicator() {
         )}
 
         {status === 'error' && (
-          <div className="text-[9px] text-[#FF8A80]">
+          <div className="text-[9px] text-danger">
             Error · <button className="underline" onClick={syncNow}>retry</button>
           </div>
         )}

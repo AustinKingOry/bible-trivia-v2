@@ -38,7 +38,7 @@ export function ActionButtons({
 
   return (
     <div className="panel flex flex-col gap-3">
-      <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase">
+      <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
         Record Outcome
       </div>
 
@@ -46,13 +46,13 @@ export function ActionButtons({
       {(phase === 'team1-answering' || (isHotSeat && !isDone)) && (
         <div className="grid grid-cols-2 gap-2.5">
           <Btn onClick={onCorrect} disabled={isDone}
-            bg="rgba(26,138,74,0.18)" hoverBg="rgba(26,138,74,0.38)" border="#1A8A4A" color="#6DFFAA">
+            bg="color-mix(in oklab, var(--success-solid) 18%, transparent)" hoverBg="color-mix(in oklab, var(--success-solid) 38%, transparent)" border="var(--success-solid)" color="var(--success)">
             <span className="font-display text-xl tracking-wide">✓ CORRECT</span>
             <sub className="text-[10px] opacity-70 uppercase tracking-wide not-italic">+{cs?.pointsCorrect ?? '?'} pts</sub>
           </Btn>
 
           <Btn onClick={onWrong} disabled={isDone}
-            bg="rgba(192,57,43,0.18)" hoverBg="rgba(192,57,43,0.38)" border="#C0392B" color="#FF8A80">
+            bg="color-mix(in oklab, var(--danger-solid) 18%, transparent)" hoverBg="color-mix(in oklab, var(--danger-solid) 38%, transparent)" border="var(--danger-solid)" color="var(--danger)">
             <span className="font-display text-xl tracking-wide">✗ WRONG</span>
             <sub className="text-[10px] opacity-70 uppercase tracking-wide not-italic">
               {cs?.pointsWrong !== 0 ? `${cs?.pointsWrong} pts` : 'no deduction'}
@@ -63,7 +63,7 @@ export function ActionButtons({
           {!isHotSeat && (
             <>
               <Btn onClick={onPass} disabled={isDone || !allowPass}
-                bg="rgba(230,126,34,0.15)" hoverBg="rgba(230,126,34,0.32)" border="#E67E22" color="#FFB347">
+                bg="color-mix(in oklab, var(--secondary) 15%, transparent)" hoverBg="color-mix(in oklab, var(--secondary) 32%, transparent)" border="var(--secondary)" color="var(--secondary)">
                 <span className="font-display text-xl tracking-wide">→ PASS</span>
                 <sub className="text-[10px] opacity-70 uppercase tracking-wide not-italic">
                   {allowPass ? (allowSteal ? 'opens steal' : 'no pts') : 'not allowed'}
@@ -72,7 +72,7 @@ export function ActionButtons({
 
               {/* Steal button is inactive during team1 answering — shown dimmed as a reminder */}
               <Btn onClick={() => {}} disabled={true}
-                bg="rgba(46,134,222,0.08)" hoverBg="rgba(46,134,222,0.08)" border="rgba(46,134,222,0.2)" color="rgba(116,185,255,0.35)">
+                bg="color-mix(in oklab, var(--info) 8%, transparent)" hoverBg="color-mix(in oklab, var(--info) 8%, transparent)" border="color-mix(in oklab, var(--info) 20%, transparent)" color="color-mix(in oklab, var(--info) 35%, transparent)">
                 <span className="font-display text-xl tracking-wide">⚡ STEAL</span>
                 <sub className="text-[10px] opacity-70 uppercase tracking-wide not-italic">
                   {allowSteal ? 'after wrong/pass' : 'N/A'}
@@ -87,7 +87,7 @@ export function ActionButtons({
       {phase === 'steal-offered' && (
         <div className="flex flex-col gap-2.5 animate-slide-up">
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-semibold"
-            style={{ background: 'rgba(46,134,222,0.1)', border: '1px solid rgba(46,134,222,0.35)', color: '#74B9FF' }}>
+            style={{ background: 'color-mix(in oklab, var(--info) 10%, transparent)', border: '1px solid color-mix(in oklab, var(--info) 35%, transparent)', color: 'var(--info)' }}>
             <span className="text-base">⚡</span>
             Question passed — which team attempts to steal?
           </div>
@@ -99,12 +99,12 @@ export function ActionButtons({
                 key={t.id}
                 onClick={() => onOfferSteal(t.id)}
                 className="flex items-center gap-3 px-4 py-3.5 rounded-lg font-semibold text-sm text-left transition-all"
-                style={{ background: 'rgba(46,134,222,0.15)', border: '2px solid rgba(46,134,222,0.5)', color: '#74B9FF',
-                  boxShadow: '0 0 12px rgba(46,134,222,0.2)' }}
-                onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(46,134,222,0.3)')}
-                onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(46,134,222,0.15)')}
+                style={{ background: 'color-mix(in oklab, var(--info) 15%, transparent)', border: '2px solid color-mix(in oklab, var(--info) 50%, transparent)', color: 'var(--info)',
+                  boxShadow: '0 0 12px color-mix(in oklab, var(--info) 20%, transparent)' }}
+                onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--info) 30%, transparent)')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--info) 15%, transparent)')}
               >
-                <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: t.color }} />
+                <span className="w-3 h-3 rounded-full shrink-0" style={{ background: t.color }} />
                 <span className="flex-1">{t.name} steals</span>
                 <span className="font-display text-lg tracking-wide">⚡ +{cs?.stealPoints} pts →</span>
               </button>
@@ -115,9 +115,9 @@ export function ActionButtons({
           <button
             onClick={onSkipSteal}
             className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: '#9BA8C4' }}
-            onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
-            onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+            style={{ background: 'color-mix(in oklab, var(--foreground) 5%, transparent)', border: '1px solid color-mix(in oklab, var(--foreground) 12%, transparent)', color: 'var(--muted-foreground)' }}
+            onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--foreground) 10%, transparent)')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--foreground) 5%, transparent)')}
           >
             No steal — skip to next question
           </button>
@@ -128,21 +128,21 @@ export function ActionButtons({
       {phase === 'team2-answering' && (
         <div className="flex flex-col gap-2.5 animate-slide-up">
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-semibold"
-            style={{ background: 'rgba(46,134,222,0.12)', border: '1px solid rgba(46,134,222,0.4)', color: '#74B9FF' }}>
-            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ background: 'color-mix(in oklab, var(--info) 12%, transparent)', border: '1px solid color-mix(in oklab, var(--info) 40%, transparent)', color: 'var(--info)' }}>
+            <span className="w-2.5 h-2.5 rounded-full shrink-0"
               style={{ background: teams.find(t => t.id === stealingTeamId)?.color }} />
             {teams.find(t => t.id === stealingTeamId)?.name} is answering — no further steal possible
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
             <Btn onClick={onStealCorrect} disabled={false}
-              bg="rgba(26,138,74,0.18)" hoverBg="rgba(26,138,74,0.38)" border="#1A8A4A" color="#6DFFAA">
+              bg="color-mix(in oklab, var(--success-solid) 18%, transparent)" hoverBg="color-mix(in oklab, var(--success-solid) 38%, transparent)" border="var(--success-solid)" color="var(--success)">
               <span className="font-display text-xl tracking-wide">✓ CORRECT</span>
               <sub className="text-[10px] opacity-70 uppercase tracking-wide not-italic">+{cs?.stealPoints ?? '?'} pts</sub>
             </Btn>
 
             <Btn onClick={onStealWrong} disabled={false}
-              bg="rgba(192,57,43,0.18)" hoverBg="rgba(192,57,43,0.38)" border="#C0392B" color="#FF8A80">
+              bg="color-mix(in oklab, var(--danger-solid) 18%, transparent)" hoverBg="color-mix(in oklab, var(--danger-solid) 38%, transparent)" border="var(--danger-solid)" color="var(--danger)">
               <span className="font-display text-xl tracking-wide">✗ WRONG</span>
               <sub className="text-[10px] opacity-70 uppercase tracking-wide not-italic">no steal scored</sub>
             </Btn>
@@ -156,7 +156,7 @@ export function ActionButtons({
           onClick={onNext}
           disabled={!isDone}
           className="w-full py-3.5 rounded-lg font-display text-xl tracking-widest transition-all disabled:opacity-25 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+          style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
           onMouseOver={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.opacity = '0.88' }}
           onMouseOut={(e) => { e.currentTarget.style.opacity = '1' }}
         >
@@ -165,9 +165,9 @@ export function ActionButtons({
         <button
           onClick={onEndRound}
           className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-          style={{ background: 'rgba(192,57,43,0.1)', border: '1px solid rgba(192,57,43,0.35)', color: '#F1948A' }}
-          onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(192,57,43,0.25)')}
-          onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(192,57,43,0.1)')}
+          style={{ background: 'color-mix(in oklab, var(--danger-solid) 10%, transparent)', border: '1px solid color-mix(in oklab, var(--danger-solid) 35%, transparent)', color: 'var(--danger)' }}
+          onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--danger-solid) 25%, transparent)')}
+          onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--danger-solid) 10%, transparent)')}
         >
           End Round
         </button>

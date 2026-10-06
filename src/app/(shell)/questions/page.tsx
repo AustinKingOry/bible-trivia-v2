@@ -58,15 +58,15 @@ export default function QuestionsPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Page header */}
       <div
-        className="border-b px-6 py-4 flex items-center justify-between flex-shrink-0"
-        style={{ borderColor: 'rgba(245,200,66,0.18)', background: 'linear-gradient(135deg,#142240,#0D1E38)' }}
+        className="border-b px-6 py-4 flex items-center justify-between shrink-0"
+        style={{ borderColor: 'color-mix(in oklab, var(--primary) 18%, transparent)', background: 'linear-gradient(135deg,var(--card),var(--sidebar))' }}
       >
         <div>
           <h1 className="font-display text-2xl tracking-widest text-gold-glow">QUESTIONS</h1>
-          <p className="text-[#9BA8C4] text-xs tracking-wide mt-0.5">
+          <p className="text-muted-foreground text-xs tracking-wide mt-0.5">
             {allQuestions.length} total &middot; {Object.keys(customQuestions).length} custom added
           </p>
         </div>
@@ -76,9 +76,9 @@ export default function QuestionsPage() {
           <button
             onClick={() => setSettingsOpen(true)}
             className="relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-            style={{ background: 'rgba(123,47,190,0.18)', border: '1px solid rgba(123,47,190,0.4)', color: '#C084FC' }}
-            onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(123,47,190,0.32)')}
-            onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(123,47,190,0.18)')}
+            style={{ background: 'color-mix(in oklab, var(--secondary) 18%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 40%, transparent)', color: 'var(--secondary)' }}
+            onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--secondary) 32%, transparent)')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--secondary) 18%, transparent)')}
             title="Scoring & Timing Settings"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -88,7 +88,7 @@ export default function QuestionsPage() {
             {modifiedSettingsCount > 0 && (
               <span
                 className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
-                style={{ background: '#F5C842', color: '#0A1628' }}
+                style={{ background: 'var(--primary)', color: 'var(--background)' }}
               >
                 {modifiedSettingsCount}
               </span>
@@ -96,23 +96,23 @@ export default function QuestionsPage() {
           </button>
 
           {/* Tab toggle */}
-          <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid rgba(245,200,66,0.2)' }}>
+          <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}>
             <button
               onClick={() => setTab('browse')}
               className="px-4 py-2 text-xs font-semibold transition-all"
-              style={tab === 'browse' ? { background: 'rgba(245,200,66,0.15)', color: '#F5C842' } : { color: '#9BA8C4' }}
+              style={tab === 'browse' ? { background: 'color-mix(in oklab, var(--primary) 15%, transparent)', color: 'var(--primary)' } : { color: 'var(--muted-foreground)' }}
             >
               Browse
             </button>
             <button
               onClick={() => setTab('pdf')}
               className="px-4 py-2 text-xs font-semibold transition-all flex items-center gap-1.5"
-              style={tab === 'pdf' ? { background: 'rgba(245,200,66,0.15)', color: '#F5C842' } : { color: '#9BA8C4' }}
+              style={tab === 'pdf' ? { background: 'color-mix(in oklab, var(--primary) 15%, transparent)', color: 'var(--primary)' } : { color: 'var(--muted-foreground)' }}
             >
               <span>📄</span> AI Import
               <span
-                className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide"
-                style={{ background: 'rgba(123,47,190,0.3)', color: '#C084FC', border: '1px solid rgba(123,47,190,0.4)' }}
+                className="px-1.5 py-0.5 rounded-sm text-[9px] font-bold tracking-wide"
+                style={{ background: 'color-mix(in oklab, var(--secondary) 30%, transparent)', color: 'var(--secondary)', border: '1px solid color-mix(in oklab, var(--secondary) 40%, transparent)' }}
               >
                 BETA
               </span>
@@ -123,7 +123,7 @@ export default function QuestionsPage() {
             <button
               onClick={() => { setEditingQuestion(null); setDrawerOpen(true) }}
               className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-              style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+              style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
               onMouseOver={(e) => (e.currentTarget.style.opacity = '0.88')}
               onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
             >
@@ -137,8 +137,8 @@ export default function QuestionsPage() {
         <div className="flex flex-1 overflow-hidden">
           {/* Category sidebar */}
           <div
-            className="w-52 flex-shrink-0 border-r overflow-y-auto py-3"
-            style={{ borderColor: 'rgba(245,200,66,0.12)', background: '#0D1E38' }}
+            className="w-52 shrink-0 border-r overflow-y-auto py-3"
+            style={{ borderColor: 'color-mix(in oklab, var(--primary) 12%, transparent)', background: 'var(--sidebar)' }}
           >
             {CATEGORIES.map((cat) => {
               const total = countFor(cat.id)
@@ -157,27 +157,27 @@ export default function QuestionsPage() {
                   className="w-full text-left px-4 py-3 transition-all"
                   style={
                     active
-                      ? { background: 'rgba(245,200,66,0.1)', borderRight: '2px solid #F5C842' }
+                      ? { background: 'color-mix(in oklab, var(--primary) 10%, transparent)', borderRight: '2px solid var(--primary)' }
                       : { borderRight: '2px solid transparent' }
                   }
-                  onMouseOver={(e) => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
+                  onMouseOver={(e) => { if (!active) e.currentTarget.style.background = 'color-mix(in oklab, var(--foreground) 4%, transparent)' }}
                   onMouseOut={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
                 >
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-base">{cat.icon}</span>
-                    <span className={`text-xs font-semibold leading-tight ${active ? 'text-[#F5C842]' : 'text-[#F0EDD8]'}`}>
+                    <span className={`text-xs font-semibold leading-tight ${active ? 'text-primary' : 'text-foreground'}`}>
                       {cat.name}
                     </span>
                     {hasModifiedSettings && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#C084FC] flex-shrink-0" title="Custom settings" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" title="Custom settings" />
                     )}
                   </div>
                   <div className="flex items-center gap-2 pl-6">
-                    <span className="text-[10px] text-[#9BA8C4]">{total} qs</span>
+                    <span className="text-[10px] text-muted-foreground">{total} qs</span>
                     {custom > 0 && (
                       <span
                         className="text-[9px] px-1.5 py-0.5 rounded-full font-bold"
-                        style={{ background: 'rgba(26,138,74,0.2)', color: '#6DFFAA', border: '1px solid rgba(26,138,74,0.3)' }}
+                        style={{ background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)', color: 'var(--success)', border: '1px solid color-mix(in oklab, var(--success-solid) 30%, transparent)' }}
                       >
                         +{custom}
                       </span>
@@ -192,21 +192,21 @@ export default function QuestionsPage() {
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Category header + filters */}
             <div
-              className="px-6 py-3 border-b flex items-center gap-4 flex-shrink-0"
-              style={{ borderColor: 'rgba(245,200,66,0.12)' }}
+              className="px-6 py-3 border-b flex items-center gap-4 shrink-0"
+              style={{ borderColor: 'color-mix(in oklab, var(--primary) 12%, transparent)' }}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{activeCategory.icon}</span>
-                  <h2 className="font-display text-lg tracking-wider text-[#F0EDD8]">{activeCategory.name}</h2>
-                  <span className="text-xs text-[#9BA8C4]">· {categoryQuestions.length} shown</span>
+                  <h2 className="font-display text-lg tracking-wider text-foreground">{activeCategory.name}</h2>
+                  <span className="text-xs text-muted-foreground">· {categoryQuestions.length} shown</span>
                 </div>
-                <p className="text-[11px] text-[#9BA8C4] mt-0.5">{activeCategory.description}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{activeCategory.description}</p>
               </div>
               <div className="flex gap-1.5">
                 {['all', 'easy', 'medium', 'hard'].map((d) => {
                   const colors: Record<string, string> = {
-                    all: '#9BA8C4', easy: '#6DFFAA', medium: '#F5C842', hard: '#FF8A80',
+                    all: 'var(--muted-foreground)', easy: 'var(--success)', medium: 'var(--primary)', hard: 'var(--danger)',
                   }
                   const isActive = filterDifficulty === d
                   return (
@@ -216,8 +216,8 @@ export default function QuestionsPage() {
                       className="px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all"
                       style={
                         isActive
-                          ? { background: `${colors[d]}18`, color: colors[d], border: `1px solid ${colors[d]}55` }
-                          : { color: '#9BA8C4', border: '1px solid transparent' }
+                          ? { background: `color-mix(in oklab, ${colors[d]} 9%, transparent)`, color: colors[d], border: `1px solid color-mix(in oklab, ${colors[d]} 33%, transparent)` }
+                          : { color: 'var(--muted-foreground)', border: '1px solid transparent' }
                       }
                     >
                       {d === 'all' ? 'All' : d.charAt(0).toUpperCase() + d.slice(1)}
@@ -229,16 +229,16 @@ export default function QuestionsPage() {
 
             {/* Topic filter row */}
             <div
-              className="px-6 py-2 border-b flex items-center gap-2 flex-wrap flex-shrink-0"
-              style={{ borderColor: 'rgba(245,200,66,0.08)' }}
+              className="px-6 py-2 border-b flex items-center gap-2 flex-wrap shrink-0"
+              style={{ borderColor: 'color-mix(in oklab, var(--primary) 8%, transparent)' }}
             >
-              <span className="text-[10px] text-[#9BA8C4] font-semibold uppercase tracking-widest mr-1 flex-shrink-0">Topic:</span>
+              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest mr-1 shrink-0">Topic:</span>
               <button
                 onClick={() => setFilterTopic(ALL_TOPICS_TAG)}
                 className="px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all"
                 style={filterTopic === ALL_TOPICS_TAG
-                  ? { background: 'rgba(245,200,66,0.15)', border: '1px solid rgba(245,200,66,0.4)', color: '#F5C842' }
-                  : { background: 'rgba(255,255,255,0.04)', border: '1px solid transparent', color: '#9BA8C4' }
+                  ? { background: 'color-mix(in oklab, var(--primary) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 40%, transparent)', color: 'var(--primary)' }
+                  : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1px solid transparent', color: 'var(--muted-foreground)' }
                 }
               >
                 All topics
@@ -249,8 +249,8 @@ export default function QuestionsPage() {
                   onClick={() => setFilterTopic(t.tag)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all"
                   style={filterTopic === t.tag
-                    ? { background: 'rgba(123,47,190,0.2)', border: '1px solid rgba(123,47,190,0.5)', color: '#C084FC' }
-                    : { background: 'rgba(255,255,255,0.04)', border: '1px solid transparent', color: '#9BA8C4' }
+                    ? { background: 'color-mix(in oklab, var(--secondary) 20%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 50%, transparent)', color: 'var(--secondary)' }
+                    : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '1px solid transparent', color: 'var(--muted-foreground)' }
                   }
                 >
                   <span>{t.emoji}</span> {t.label}

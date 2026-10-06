@@ -36,7 +36,7 @@ export function CharacterForm({ value, onChange }: Props) {
           placeholder={"I was a shepherd boy who defeated a giant named Goliath with a sling and a stone."}
           rows={4}
         />
-        <p className="text-[10px] text-[#9BA8C4] mt-1">
+        <p className="text-[10px] text-muted-foreground mt-1">
           &ldquo;Who am I?&rdquo; is added automatically.
         </p>
       </Field>
@@ -53,15 +53,15 @@ export function CharacterForm({ value, onChange }: Props) {
       {rawClues && (
         <div
           className="rounded-lg p-3 mt-1"
-          style={{ background: 'rgba(245,200,66,0.06)', border: '1px solid rgba(245,200,66,0.2)' }}
+          style={{ background: 'color-mix(in oklab, var(--primary) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}
         >
-          <p className="text-[10px] font-bold tracking-widest text-[#9BA8C4] uppercase mb-2">Preview</p>
-          <p className="text-sm text-[#F0EDD8] mb-1.5">
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Preview</p>
+          <p className="text-sm text-foreground mb-1.5">
             {rawClues}. Who am I?
           </p>
           {value.answer && (
-            <p className="text-sm text-[#6DFFAA]">
-              <span className="text-[#9BA8C4]">A: </span>{value.answer}
+            <p className="text-sm text-success">
+              <span className="text-muted-foreground">A: </span>{value.answer}
             </p>
           )}
         </div>

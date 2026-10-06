@@ -36,7 +36,7 @@ export function TrueFalseForm({ value, onChange }: Props) {
           rows={3}
         />
         {tf.statement && (
-          <p className="text-[10px] text-[#9BA8C4] mt-1">
+          <p className="text-[10px] text-muted-foreground mt-1">
             Will be shown as: <em>True or False: {tf.statement}</em>
           </p>
         )}
@@ -51,8 +51,8 @@ export function TrueFalseForm({ value, onChange }: Props) {
             className="py-5 rounded-xl font-display text-2xl tracking-widest transition-all"
             style={
               tf.isTrue
-                ? { background: 'rgba(26,138,74,0.25)', border: '2.5px solid #1A8A4A', color: '#6DFFAA', boxShadow: '0 0 20px rgba(26,138,74,0.3)' }
-                : { background: 'rgba(255,255,255,0.04)', border: '2.5px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }
+                ? { background: 'color-mix(in oklab, var(--success-solid) 25%, transparent)', border: '2.5px solid var(--success-solid)', color: 'var(--success)', boxShadow: '0 0 20px color-mix(in oklab, var(--success-solid) 30%, transparent)' }
+                : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '2.5px solid color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }
             }
           >
             ✓ TRUE
@@ -63,8 +63,8 @@ export function TrueFalseForm({ value, onChange }: Props) {
             className="py-5 rounded-xl font-display text-2xl tracking-widest transition-all"
             style={
               !tf.isTrue
-                ? { background: 'rgba(192,57,43,0.25)', border: '2.5px solid #C0392B', color: '#FF8A80', boxShadow: '0 0 20px rgba(192,57,43,0.3)' }
-                : { background: 'rgba(255,255,255,0.04)', border: '2.5px solid rgba(255,255,255,0.1)', color: '#9BA8C4' }
+                ? { background: 'color-mix(in oklab, var(--danger-solid) 25%, transparent)', border: '2.5px solid var(--danger-solid)', color: 'var(--danger)', boxShadow: '0 0 20px color-mix(in oklab, var(--danger-solid) 30%, transparent)' }
+                : { background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: '2.5px solid color-mix(in oklab, var(--foreground) 10%, transparent)', color: 'var(--muted-foreground)' }
             }
           >
             ✗ FALSE
@@ -87,23 +87,23 @@ export function TrueFalseForm({ value, onChange }: Props) {
       {tf.statement && (
         <div
           className="rounded-lg p-3 mt-1"
-          style={{ background: 'rgba(245,200,66,0.06)', border: '1px solid rgba(245,200,66,0.2)' }}
+          style={{ background: 'color-mix(in oklab, var(--primary) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}
         >
-          <p className="text-[10px] font-bold tracking-widest text-[#9BA8C4] uppercase mb-2">Preview</p>
-          <p className="text-sm text-[#F0EDD8] mb-2">True or False: {tf.statement}</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Preview</p>
+          <p className="text-sm text-foreground mb-2">True or False: {tf.statement}</p>
           <div className="flex items-start gap-2">
             <span
-              className="px-2.5 py-1 rounded font-display text-base tracking-wide flex-shrink-0"
+              className="px-2.5 py-1 rounded-sm font-display text-base tracking-wide shrink-0"
               style={
                 tf.isTrue
-                  ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' }
-                  : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }
+                  ? { background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)', color: 'var(--success)' }
+                  : { background: 'color-mix(in oklab, var(--danger-solid) 20%, transparent)', color: 'var(--danger)' }
               }
             >
               {tf.isTrue ? 'TRUE' : 'FALSE'}
             </span>
             {tf.explanation && (
-              <span className="text-xs text-[#9BA8C4] leading-relaxed">{tf.explanation}</span>
+              <span className="text-xs text-muted-foreground leading-relaxed">{tf.explanation}</span>
             )}
           </div>
         </div>

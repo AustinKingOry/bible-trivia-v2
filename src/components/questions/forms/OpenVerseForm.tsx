@@ -40,19 +40,19 @@ export function OpenVerseForm({ value, onChange }: Props) {
           <select
             value={ov.book}
             onChange={(e) => update({ book: e.target.value })}
-            className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none appearance-none"
+            className="w-full px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden appearance-none"
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(245,200,66,0.2)',
+              background: 'color-mix(in oklab, var(--foreground) 6%, transparent)',
+              border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)',
               fontFamily: 'var(--font-body)',
             }}
           >
-            <option value="" style={{ background: '#142240' }}>Select a book...</option>
+            <option value="" style={{ background: 'var(--card)' }}>Select a book...</option>
             {BOOKS.map((b) => (
-              <option key={b} value={b} style={{ background: '#142240' }}>{b}</option>
+              <option key={b} value={b} style={{ background: 'var(--card)' }}>{b}</option>
             ))}
           </select>
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9BA8C4] pointer-events-none">▾</span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">▾</span>
         </div>
       </Field>
 
@@ -94,14 +94,14 @@ export function OpenVerseForm({ value, onChange }: Props) {
       {ref && (
         <div
           className="rounded-lg p-3 mt-1"
-          style={{ background: 'rgba(245,200,66,0.06)', border: '1px solid rgba(245,200,66,0.2)' }}
+          style={{ background: 'color-mix(in oklab, var(--primary) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}
         >
-          <p className="text-[10px] font-bold tracking-widest text-[#9BA8C4] uppercase mb-2">Preview</p>
-          <p className="text-sm text-[#F0EDD8] mb-1.5">
-            Open your Bible to <span className="text-[#F5C842] font-semibold">{ref}</span>. What does this verse say?
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Preview</p>
+          <p className="text-sm text-foreground mb-1.5">
+            Open your Bible to <span className="text-primary font-semibold">{ref}</span>. What does this verse say?
           </p>
           {ov.verseText && (
-            <p className="text-sm text-[#6DFFAA] italic">&ldquo;{ov.verseText}&rdquo;</p>
+            <p className="text-sm text-success italic">&ldquo;{ov.verseText}&rdquo;</p>
           )}
         </div>
       )}

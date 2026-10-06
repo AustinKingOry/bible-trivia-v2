@@ -15,14 +15,14 @@ export function PdfUploadPanel() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Sub-tab bar */}
-      <div className="flex gap-1 px-6 pt-4 pb-0 flex-shrink-0">
+      <div className="flex gap-1 px-6 pt-4 pb-0 shrink-0">
         <SubTab
           active={importTab === 'json'}
           onClick={() => setImportTab('json')}
           icon="{ }"
           label="Paste JSON"
           badge="Recommended"
-          badgeColor="#6DFFAA"
+          badgeColor="var(--success)"
         />
         <SubTab
           active={importTab === 'pdf'}
@@ -30,12 +30,12 @@ export function PdfUploadPanel() {
           icon="📄"
           label="PDF Upload"
           badge="Coming soon"
-          badgeColor="#9BA8C4"
+          badgeColor="var(--muted-foreground)"
         />
       </div>
 
       {/* Divider */}
-      <div className="mx-6 mt-3 mb-0 h-px" style={{ background: 'rgba(245,200,66,0.15)' }} />
+      <div className="mx-6 mt-3 mb-0 h-px" style={{ background: 'color-mix(in oklab, var(--primary) 15%, transparent)' }} />
 
       {importTab === 'json' ? <JsonImportPanel /> : <PdfUploadStub />}
     </div>
@@ -52,15 +52,15 @@ function SubTab({ active, onClick, icon, label, badge, badgeColor }: {
       onClick={onClick}
       className="flex items-center gap-2 px-4 py-2.5 rounded-t-lg text-sm font-semibold transition-all"
       style={active
-        ? { background: '#142240', color: '#F5C842', borderTop: '1px solid rgba(245,200,66,0.3)', borderLeft: '1px solid rgba(245,200,66,0.3)', borderRight: '1px solid rgba(245,200,66,0.3)' }
-        : { color: '#9BA8C4' }
+        ? { background: 'var(--card)', color: 'var(--primary)', borderTop: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)', borderLeft: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)', borderRight: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)' }
+        : { color: 'var(--muted-foreground)' }
       }
     >
       <span className="font-mono text-base">{icon}</span>
       {label}
       <span
-        className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide"
-        style={{ background: `${badgeColor}22`, color: badgeColor, border: `1px solid ${badgeColor}44` }}
+        className="px-1.5 py-0.5 rounded-sm text-[9px] font-bold tracking-wide"
+        style={{ background: `color-mix(in oklab, ${badgeColor} 13%, transparent)`, color: badgeColor, border: `1px solid color-mix(in oklab, ${badgeColor} 27%, transparent)` }}
       >
         {badge}
       </span>
@@ -97,7 +97,7 @@ function PdfUploadStub() {
   }, [handleFiles])
 
   const STATUS_COLOR: Record<PdfUploadJob['status'], string> = {
-    pending: '#9BA8C4', processing: '#F5C842', done: '#6DFFAA', error: '#FF8A80',
+    pending: 'var(--muted-foreground)', processing: 'var(--primary)', done: 'var(--success)', error: 'var(--danger)',
   }
   const STATUS_ICON: Record<PdfUploadJob['status'], string> = {
     pending: '⏳', processing: '⚙️', done: '✅', error: '❌',
@@ -107,13 +107,13 @@ function PdfUploadStub() {
     <div className="flex-1 overflow-y-auto px-6 py-6 max-w-2xl mx-auto w-full">
       {/* Notice */}
       <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl mb-6"
-        style={{ background: 'rgba(123,47,190,0.1)', border: '1px solid rgba(123,47,190,0.3)' }}>
-        <span className="text-xl flex-shrink-0">💡</span>
+        style={{ background: 'color-mix(in oklab, var(--secondary) 10%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 30%, transparent)' }}>
+        <span className="text-xl shrink-0">💡</span>
         <div>
-          <p className="text-xs font-semibold text-[#C084FC] mb-0.5">Backend not connected yet</p>
-          <p className="text-xs text-[#9BA8C4] leading-relaxed">
+          <p className="text-xs font-semibold text-secondary mb-0.5">Backend not connected yet</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             PDF auto-extraction requires a server endpoint. In the meantime, upload your PDF to Claude or ChatGPT,
-            use the <strong className="text-[#F0EDD8]">Paste JSON</strong> tab to import the output.
+            use the <strong className="text-foreground">Paste JSON</strong> tab to import the output.
           </p>
         </div>
       </div>
@@ -126,18 +126,18 @@ function PdfUploadStub() {
         onClick={() => fileRef.current?.click()}
         className="rounded-2xl flex flex-col items-center justify-center py-14 px-8 text-center cursor-pointer transition-all mb-6"
         style={{
-          border: `2px dashed ${dragging ? '#F5C842' : 'rgba(245,200,66,0.25)'}`,
-          background: dragging ? 'rgba(245,200,66,0.05)' : 'rgba(255,255,255,0.02)',
+          border: `2px dashed ${dragging ? 'var(--primary)' : 'color-mix(in oklab, var(--primary) 25%, transparent)'}`,
+          background: dragging ? 'color-mix(in oklab, var(--primary) 5%, transparent)' : 'color-mix(in oklab, var(--foreground) 2%, transparent)',
           transform: dragging ? 'scale(1.01)' : 'scale(1)',
         }}
       >
         <input ref={fileRef} type="file" accept=".pdf" multiple className="sr-only"
           onChange={(e) => handleFiles(e.target.files)} />
         <div className="text-5xl mb-4">{dragging ? '📂' : '📄'}</div>
-        <p className="text-[#F0EDD8] font-semibold mb-1">{dragging ? 'Drop to queue' : 'Drop PDFs here or click to browse'}</p>
-        <p className="text-[#9BA8C4] text-xs mb-6">Supports .pdf · Max 20 MB per file</p>
+        <p className="text-foreground font-semibold mb-1">{dragging ? 'Drop to queue' : 'Drop PDFs here or click to browse'}</p>
+        <p className="text-muted-foreground text-xs mb-6">Supports .pdf · Max 20 MB per file</p>
         <div className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold"
-          style={{ background: 'rgba(245,200,66,0.1)', border: '1px solid rgba(245,200,66,0.3)', color: '#F5C842' }}>
+          style={{ background: 'color-mix(in oklab, var(--primary) 10%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)', color: 'var(--primary)' }}>
           <span>📤</span> Choose Files
         </div>
       </div>
@@ -146,28 +146,28 @@ function PdfUploadStub() {
       {jobs.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[11px] font-semibold tracking-widest text-[#9BA8C4] uppercase">Queue</h3>
-            <button onClick={() => setJobs([])} className="text-xs text-[#9BA8C4] hover:text-red-400 transition-colors">Clear all</button>
+            <h3 className="text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">Queue</h3>
+            <button onClick={() => setJobs([])} className="text-xs text-muted-foreground hover:text-red-400 transition-colors">Clear all</button>
           </div>
           <div className="flex flex-col gap-2">
             {jobs.map((job) => (
               <div key={job.id} className="flex items-center gap-3 px-4 py-3 rounded-lg animate-slide-up"
-                style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${STATUS_COLOR[job.status]}33` }}>
-                <span className="text-xl flex-shrink-0">{STATUS_ICON[job.status]}</span>
+                style={{ background: 'color-mix(in oklab, var(--foreground) 4%, transparent)', border: `1px solid color-mix(in oklab, ${STATUS_COLOR[job.status]} 20%, transparent)` }}>
+                <span className="text-xl shrink-0">{STATUS_ICON[job.status]}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-[#F0EDD8] truncate">{job.filename}</span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase flex-shrink-0"
-                      style={{ background: `${STATUS_COLOR[job.status]}22`, color: STATUS_COLOR[job.status] }}>
+                    <span className="text-sm font-medium text-foreground truncate">{job.filename}</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase shrink-0"
+                      style={{ background: `color-mix(in oklab, ${STATUS_COLOR[job.status]} 13%, transparent)`, color: STATUS_COLOR[job.status] }}>
                       {job.status}
                     </span>
                   </div>
                   {job.status === 'error' && job.error && (
-                    <p className="text-[10px] text-[#FF8A80] mt-0.5">{job.error}</p>
+                    <p className="text-[10px] text-danger mt-0.5">{job.error}</p>
                   )}
                 </div>
                 <button onClick={() => setJobs((p) => p.filter((j) => j.id !== job.id))}
-                  className="text-[#9BA8C4] hover:text-red-400 text-lg transition-colors">×</button>
+                  className="text-muted-foreground hover:text-red-400 text-lg transition-colors">×</button>
               </div>
             ))}
           </div>

@@ -14,9 +14,9 @@ interface Props {
 }
 
 const DIFF_STYLE: Record<string, { color: string; bg: string; border: string }> = {
-  easy:   { color: '#6DFFAA', bg: 'rgba(26,138,74,0.15)',   border: 'rgba(26,138,74,0.4)'   },
-  medium: { color: '#F5C842', bg: 'rgba(245,200,66,0.12)',  border: 'rgba(245,200,66,0.4)'  },
-  hard:   { color: '#FF8A80', bg: 'rgba(192,57,43,0.15)',   border: 'rgba(192,57,43,0.4)'   },
+  easy:   { color: 'var(--success)', bg: 'color-mix(in oklab, var(--success-solid) 15%, transparent)',   border: 'color-mix(in oklab, var(--success-solid) 40%, transparent)'   },
+  medium: { color: 'var(--primary)', bg: 'color-mix(in oklab, var(--primary) 12%, transparent)',  border: 'color-mix(in oklab, var(--primary) 40%, transparent)'  },
+  hard:   { color: 'var(--danger)', bg: 'color-mix(in oklab, var(--danger-solid) 15%, transparent)',   border: 'color-mix(in oklab, var(--danger-solid) 40%, transparent)'   },
 }
 
 export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
@@ -43,12 +43,12 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-16">
         <div className="text-5xl mb-4">{category.icon}</div>
-        <p className="text-[#F0EDD8] font-semibold text-lg mb-1">No questions here yet</p>
-        <p className="text-[#9BA8C4] text-sm mb-6 max-w-xs">{category.addHint}</p>
+        <p className="text-foreground font-semibold text-lg mb-1">No questions here yet</p>
+        <p className="text-muted-foreground text-sm mb-6 max-w-xs">{category.addHint}</p>
         <button
           onClick={onAdd}
           className="px-6 py-3 rounded-lg font-display text-lg tracking-wider"
-          style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+          style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
         >
           ADD FIRST QUESTION
         </button>
@@ -67,15 +67,15 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
               key={q.id}
               className="group flex items-start gap-4 px-4 py-3.5 rounded-lg transition-all"
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(245,200,66,0.1)',
+                background: 'color-mix(in oklab, var(--foreground) 3%, transparent)',
+                border: '1px solid color-mix(in oklab, var(--primary) 10%, transparent)',
               }}
-              onMouseOver={(e) => (e.currentTarget.style.borderColor = 'rgba(245,200,66,0.25)')}
-              onMouseOut={(e) => (e.currentTarget.style.borderColor = 'rgba(245,200,66,0.1)')}
+              onMouseOver={(e) => (e.currentTarget.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
+              onMouseOut={(e) => (e.currentTarget.style.borderColor = 'color-mix(in oklab, var(--primary) 10%, transparent)')}
             >
               {/* Difficulty pill */}
               <span
-                className="mt-0.5 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex-shrink-0"
+                className="mt-0.5 px-2 py-1 rounded-sm text-[10px] font-bold uppercase tracking-wide shrink-0"
                 style={{ color: ds.color, background: ds.bg, border: `1px solid ${ds.border}` }}
               >
                 {q.difficulty}
@@ -83,9 +83,9 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-[#F0EDD8] font-medium leading-snug mb-1">{q.question}</p>
-                <p className="text-xs text-[#9BA8C4] leading-snug">
-                  <span className="text-[#6DFFAA] font-semibold">A: </span>
+                <p className="text-sm text-foreground font-medium leading-snug mb-1">{q.question}</p>
+                <p className="text-xs text-muted-foreground leading-snug">
+                  <span className="text-success font-semibold">A: </span>
                   {q.answer}
                 </p>
 
@@ -93,53 +93,53 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                 {q.topicTag && (
                   <span
                     className="inline-block mt-1 mr-1.5 px-2 py-0.5 rounded-full text-[9px] font-semibold"
-                    style={{ background: 'rgba(123,47,190,0.15)', border: '1px solid rgba(123,47,190,0.3)', color: '#C084FC' }}
+                    style={{ background: 'color-mix(in oklab, var(--secondary) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 30%, transparent)', color: 'var(--secondary)' }}
                   >
                     {q.topicTag}
                   </span>
                 )}
                 {/* Category-specific details */}
                 {q.quoteFields && (
-                  <p className="text-[10px] text-[#9BA8C4] mt-1">📖 {q.quoteFields.verseRef}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">📖 {q.quoteFields.verseRef}</p>
                 )}
                 {q.openVerseFields && (
-                  <p className="text-[10px] text-[#9BA8C4] mt-1">
+                  <p className="text-[10px] text-muted-foreground mt-1">
                     📜 {q.openVerseFields.book} {q.openVerseFields.chapter}:{q.openVerseFields.verse}
                   </p>
                 )}
                 {q.trueFalseFields && (
                   <span
-                    className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded"
+                    className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-sm"
                     style={
                       q.trueFalseFields.isTrue
-                        ? { background: 'rgba(26,138,74,0.2)', color: '#6DFFAA' }
-                        : { background: 'rgba(192,57,43,0.2)', color: '#FF8A80' }
+                        ? { background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)', color: 'var(--success)' }
+                        : { background: 'color-mix(in oklab, var(--danger-solid) 20%, transparent)', color: 'var(--danger)' }
                     }
                   >
                     {q.trueFalseFields.isTrue ? 'TRUE' : 'FALSE'}
                   </span>
                 )}
                 {q.hotSeatFields && (
-                  <p className="text-[10px] text-[#9BA8C4] mt-1">
+                  <p className="text-[10px] text-muted-foreground mt-1">
                     {q.hotSeatFields.acceptableAnswers.length} acceptable answers
                   </p>
                 )}
               </div>
 
               {/* Source badge + actions */}
-              <div className="flex items-center gap-2 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                 {isCustom && (
                   <span
-                    className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                    style={{ background: 'rgba(26,138,74,0.2)', color: '#6DFFAA', border: '1px solid rgba(26,138,74,0.3)' }}
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
+                    style={{ background: 'color-mix(in oklab, var(--success-solid) 20%, transparent)', color: 'var(--success)', border: '1px solid color-mix(in oklab, var(--success-solid) 30%, transparent)' }}
                   >
                     CUSTOM
                   </span>
                 )}
                 {q.source === 'ai' && (
                   <span
-                    className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                    style={{ background: 'rgba(123,47,190,0.2)', color: '#C084FC', border: '1px solid rgba(123,47,190,0.3)' }}
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm"
+                    style={{ background: 'color-mix(in oklab, var(--secondary) 20%, transparent)', color: 'var(--secondary)', border: '1px solid color-mix(in oklab, var(--secondary) 30%, transparent)' }}
                   >
                     AI
                   </span>
@@ -151,29 +151,29 @@ export function QuestionList({ questions, category, onEdit, onAdd }: Props) {
                       <button
                         onClick={() => handleSyncQuestion(q)}
                         disabled={syncingId === q.id}
-                        className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded transition-all disabled:opacity-50"
-                        style={{ background: 'rgba(245,200,66,0.15)', color: '#F5C842', border: '1px solid rgba(245,200,66,0.3)' }}
+                        className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-sm transition-all disabled:opacity-50"
+                        style={{ background: 'color-mix(in oklab, var(--primary) 15%, transparent)', color: 'var(--primary)', border: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)' }}
                         title="Not synced — click to push"
                       >
                         {syncingId === q.id ? '…' : '↑'}
                       </button>
                     )}
                     {q.synced === false && !user && (
-                      <span className="text-[9px] text-[#4A5568]" title="Sign in to sync">⚬</span>
+                      <span className="text-[9px] text-subtle" title="Sign in to sync">⚬</span>
                     )}
                     {q.synced === true && (
-                      <span className="text-[9px] text-[#6DFFAA]" title="Synced">✓</span>
+                      <span className="text-[9px] text-success" title="Synced">✓</span>
                     )}
                     <button
                       onClick={() => onEdit(q)}
-                      className="text-[#9BA8C4] hover:text-[#F5C842] text-xs font-semibold transition-colors px-2 py-1 rounded"
-                      style={{ background: 'rgba(255,255,255,0.06)' }}
+                      className="text-muted-foreground hover:text-primary text-xs font-semibold transition-colors px-2 py-1 rounded-sm"
+                      style={{ background: 'color-mix(in oklab, var(--foreground) 6%, transparent)' }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteQuestion(q)}
-                      className="text-[#9BA8C4] hover:text-red-400 text-lg transition-colors leading-none px-1"
+                      className="text-muted-foreground hover:text-red-400 text-lg transition-colors leading-none px-1"
                     >
                       ×
                     </button>

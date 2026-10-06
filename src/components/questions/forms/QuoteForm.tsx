@@ -59,18 +59,18 @@ export function QuoteForm({ value, onChange }: Props) {
       {(qf.partialVerse || qf.completion) && (
         <div
           className="rounded-lg p-3 mt-2"
-          style={{ background: 'rgba(245,200,66,0.06)', border: '1px solid rgba(245,200,66,0.2)' }}
+          style={{ background: 'color-mix(in oklab, var(--primary) 6%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}
         >
-          <p className="text-[10px] font-bold tracking-widest text-[#9BA8C4] uppercase mb-2">Preview</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Preview</p>
           {qf.partialVerse && (
-            <p className="text-sm text-[#F0EDD8] mb-2">
-              <span className="text-[#9BA8C4]">Q: </span>
+            <p className="text-sm text-foreground mb-2">
+              <span className="text-muted-foreground">Q: </span>
               Complete: &ldquo;{qf.partialVerse}&rdquo;
             </p>
           )}
           {qf.completion && (
-            <p className="text-sm text-[#6DFFAA]">
-              <span className="text-[#9BA8C4]">A: </span>
+            <p className="text-sm text-success">
+              <span className="text-muted-foreground">A: </span>
               {qf.completion}{qf.verseRef && ` (${qf.verseRef})`}
             </p>
           )}

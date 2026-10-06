@@ -65,10 +65,10 @@ export default function ImagePlayPage({
   }, [round?.questionIndex])
 
   if (!session || !round) return (
-    <div className="flex items-center justify-center h-full text-[#9BA8C4]">
+    <div className="flex items-center justify-center h-full text-muted-foreground">
       <div className="text-center">
         <p className="text-xl mb-3">Round not found.</p>
-        <Link href={`/image-game/session/${sessionId}`} className="text-[#F5C842] underline">← Back</Link>
+        <Link href={`/image-game/session/${sessionId}`} className="text-primary underline">← Back</Link>
       </div>
     </div>
   )
@@ -85,7 +85,7 @@ export default function ImagePlayPage({
 
   // Timer visuals
   const timerPct = (timeLeft / round.answerTimeSecs) * 100
-  const timerColor = timerPct > 60 ? '#F5C842' : timerPct > 30 ? '#E67E22' : '#C0392B'
+  const timerColor = timerPct > 60 ? 'var(--primary)' : timerPct > 30 ? 'var(--secondary)' : 'var(--danger-solid)'
 
   const handleResult = (result: 'correct' | 'wrong' | 'skip') => {
     stopTimer()
@@ -123,28 +123,28 @@ export default function ImagePlayPage({
   ).filter(Boolean)
 
   const diffBadge: Record<string, string> = {
-    easy: 'text-[#6DFFAA] border-emerald-600/40 bg-emerald-900/20',
-    medium: 'text-[#F5C842] border-yellow-600/40 bg-yellow-900/10',
-    hard: 'text-[#FF8A80] border-red-700/40 bg-red-900/15',
-    all: 'text-[#F5C842] border-yellow-600/40 bg-yellow-900/10',
+    easy: 'text-success border-emerald-600/40 bg-emerald-900/20',
+    medium: 'text-primary border-yellow-600/40 bg-yellow-900/10',
+    hard: 'text-danger border-red-700/40 bg-red-900/15',
+    all: 'text-primary border-yellow-600/40 bg-yellow-900/10',
   }
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="border-b px-4 py-2.5 flex items-center gap-3 flex-shrink-0"
-        style={{ borderColor: 'rgba(245,200,66,0.25)', background: 'linear-gradient(135deg,#142240,#1E3360)' }}>
+      <header className="border-b px-4 py-2.5 flex items-center gap-3 shrink-0"
+        style={{ borderColor: 'color-mix(in oklab, var(--primary) 25%, transparent)', background: 'linear-gradient(135deg,var(--card),var(--surface))' }}>
         <Link href={`/image-game/session/${sessionId}`}
-          className="text-[#9BA8C4] hover:text-[#F5C842] text-base transition-colors">←</Link>
+          className="text-muted-foreground hover:text-primary text-base transition-colors">←</Link>
         <div className="font-display text-lg tracking-widest text-gold-glow flex-1 truncate">{round.name}</div>
         {round.topicTag && (
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
-            style={{ background: 'rgba(123,47,190,0.2)', border: '1px solid rgba(123,47,190,0.4)', color: '#C084FC' }}>
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0"
+            style={{ background: 'color-mix(in oklab, var(--secondary) 20%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 40%, transparent)', color: 'var(--secondary)' }}>
             🏷️ {round.topicTag}
           </span>
         )}
-        <div className="flex items-center gap-1.5 text-xs text-[#9BA8C4] flex-shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#6DFFAA] animate-pulse" />
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
           {qIdx}/{qTotal}
         </div>
       </header>
@@ -155,7 +155,7 @@ export default function ImagePlayPage({
 
           {/* Image display — the star of the show */}
           <div className="relative flex-1 rounded-2xl overflow-hidden flex items-center justify-center"
-            style={{ minHeight: '320px', background: '#0A1628', border: '2px solid rgba(245,200,66,0.3)' }}>
+            style={{ minHeight: '320px', background: 'var(--background)', border: '2px solid color-mix(in oklab, var(--primary) 30%, transparent)' }}>
             {question?.imageUrl ? (
               <img
                 src={question.imageUrl}
@@ -165,7 +165,7 @@ export default function ImagePlayPage({
                 draggable={false}
               />
             ) : (
-              <div className="text-[#9BA8C4] text-center">
+              <div className="text-muted-foreground text-center">
                 <div className="text-5xl mb-3">🖼️</div>
                 <p>No image for this question</p>
               </div>
@@ -192,7 +192,7 @@ export default function ImagePlayPage({
               )}
               {question?.topicTag && (
                 <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase"
-                  style={{ background: 'rgba(123,47,190,0.3)', border: '1px solid rgba(123,47,190,0.5)', color: '#C084FC' }}>
+                  style={{ background: 'color-mix(in oklab, var(--secondary) 30%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 50%, transparent)', color: 'var(--secondary)' }}>
                   {question.topicTag}
                 </span>
               )}
@@ -201,7 +201,7 @@ export default function ImagePlayPage({
             {/* Timer clock top-right */}
             {!answered && (
               <div className="absolute top-3 right-3 font-display text-5xl tabular-nums"
-                style={{ color: timerColor, textShadow: `0 0 20px ${timerColor}88` }}>
+                style={{ color: timerColor, textShadow: `0 0 20px color-mix(in oklab, ${timerColor} 53%, transparent)` }}>
                 {timeLeft}
               </div>
             )}
@@ -210,11 +210,11 @@ export default function ImagePlayPage({
           {/* Answer reveal */}
           {revealAnswer && question && (
             <div className="rounded-xl px-5 py-4 animate-slide-up"
-              style={{ background: 'rgba(26,138,74,0.15)', border: '1.5px solid rgba(26,138,74,0.5)' }}>
-              <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase mb-1">Answer</div>
-              <div className="text-xl font-bold text-[#6DFFAA]">{question.answer}</div>
+              style={{ background: 'color-mix(in oklab, var(--success-solid) 15%, transparent)', border: '1.5px solid color-mix(in oklab, var(--success-solid) 50%, transparent)' }}>
+              <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-1">Answer</div>
+              <div className="text-xl font-bold text-success">{question.answer}</div>
               {question.hint && (
-                <div className="text-xs text-[#9BA8C4] mt-1">💡 {question.hint}</div>
+                <div className="text-xs text-muted-foreground mt-1">💡 {question.hint}</div>
               )}
             </div>
           )}
@@ -222,35 +222,35 @@ export default function ImagePlayPage({
           {!revealAnswer && question?.hint && (
             <button onClick={() => setShowHint(true)}
               className="self-start px-4 py-2 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: 'rgba(230,126,34,0.12)', border: '1px solid rgba(230,126,34,0.35)', color: '#FFB347' }}
-              onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(230,126,34,0.25)')}
-              onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(230,126,34,0.12)')}>
+              style={{ background: 'color-mix(in oklab, var(--secondary) 12%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 35%, transparent)', color: 'var(--secondary)' }}
+              onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--secondary) 25%, transparent)')}
+              onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--secondary) 12%, transparent)')}>
               {showHint ? `💡 Hint: ${question.hint}` : '💡 Show Hint'}
             </button>
           )}
 
           {/* Action buttons */}
           <div className="panel flex flex-col gap-3">
-            <div className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase">
+            <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
               {answered ? 'Question done' : `${currentParticipant?.name ?? '—'} is answering`}
             </div>
 
             {!answered ? (
               <div className="grid grid-cols-3 gap-2.5">
                 <Btn onClick={() => handleResult('correct')}
-                  bg="rgba(26,138,74,0.18)" hoverBg="rgba(26,138,74,0.38)" border="#1A8A4A" color="#6DFFAA">
+                  bg="color-mix(in oklab, var(--success-solid) 18%, transparent)" hoverBg="color-mix(in oklab, var(--success-solid) 38%, transparent)" border="var(--success-solid)" color="var(--success)">
                   <span className="font-display text-xl tracking-wide">✓ CORRECT</span>
                   <sub className="text-[10px] opacity-70 not-italic uppercase">+{round.pointsCorrect} pts</sub>
                 </Btn>
                 <Btn onClick={() => handleResult('wrong')}
-                  bg="rgba(192,57,43,0.18)" hoverBg="rgba(192,57,43,0.38)" border="#C0392B" color="#FF8A80">
+                  bg="color-mix(in oklab, var(--danger-solid) 18%, transparent)" hoverBg="color-mix(in oklab, var(--danger-solid) 38%, transparent)" border="var(--danger-solid)" color="var(--danger)">
                   <span className="font-display text-xl tracking-wide">✗ WRONG</span>
                   <sub className="text-[10px] opacity-70 not-italic uppercase">
                     {round.pointsWrong > 0 ? `-${round.pointsWrong} pts` : 'no deduction'}
                   </sub>
                 </Btn>
                 <Btn onClick={() => handleResult('skip')}
-                  bg="rgba(230,126,34,0.15)" hoverBg="rgba(230,126,34,0.32)" border="#E67E22" color="#FFB347">
+                  bg="color-mix(in oklab, var(--secondary) 15%, transparent)" hoverBg="color-mix(in oklab, var(--secondary) 32%, transparent)" border="var(--secondary)" color="var(--secondary)">
                   <span className="font-display text-xl tracking-wide">→ SKIP</span>
                   <sub className="text-[10px] opacity-70 not-italic uppercase">no pts</sub>
                 </Btn>
@@ -259,7 +259,7 @@ export default function ImagePlayPage({
               <div className="flex gap-3">
                 <button onClick={handleNext}
                   className="flex-1 py-3.5 rounded-lg font-display text-xl tracking-widest transition-all"
-                  style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+                  style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
                   onMouseOver={(e) => (e.currentTarget.style.opacity = '0.88')}
                   onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}>
                   {round.questionIndex + 1 < round.questionQueue.length ? 'NEXT IMAGE →' : 'FINISH ROUND →'}
@@ -269,58 +269,58 @@ export default function ImagePlayPage({
 
             <button onClick={handleEndRound}
               className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-              style={{ background: 'rgba(192,57,43,0.1)', border: '1px solid rgba(192,57,43,0.35)', color: '#F1948A' }}
-              onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(192,57,43,0.25)')}
-              onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(192,57,43,0.1)')}>
+              style={{ background: 'color-mix(in oklab, var(--danger-solid) 10%, transparent)', border: '1px solid color-mix(in oklab, var(--danger-solid) 35%, transparent)', color: 'var(--danger)' }}
+              onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--danger-solid) 25%, transparent)')}
+              onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--danger-solid) 10%, transparent)')}>
               End Round
             </button>
           </div>
         </div>
 
         {/* ── Right sidebar ─────────────────────────────────────────────── */}
-        <div className="w-64 flex-shrink-0 flex flex-col gap-4 p-4 border-l overflow-y-auto"
-          style={{ borderColor: 'rgba(245,200,66,0.12)' }}>
+        <div className="w-64 shrink-0 flex flex-col gap-4 p-4 border-l overflow-y-auto"
+          style={{ borderColor: 'color-mix(in oklab, var(--primary) 12%, transparent)' }}>
 
           {/* Current answerer */}
           <div className="panel">
-            <div className="text-[10px] text-[#9BA8C4] uppercase tracking-widest mb-2 font-semibold">Now Answering</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-2 font-semibold">Now Answering</div>
             {currentParticipant ? (
               <div className="flex items-center gap-2.5">
-                <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: currentParticipant.color }} />
+                <span className="w-3 h-3 rounded-full shrink-0" style={{ background: currentParticipant.color }} />
                 <div>
                   <div className="font-display text-lg tracking-wide" style={{ color: currentParticipant.color }}>
                     {currentParticipant.name}
                   </div>
                   {currentParticipant.members && currentParticipant.members.length > 0 && (
-                    <div className="text-[10px] text-[#9BA8C4] mt-0.5">
+                    <div className="text-[10px] text-muted-foreground mt-0.5">
                       {currentParticipant.members.join(', ')}
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              <p className="text-[#9BA8C4] text-sm">No participants</p>
+              <p className="text-muted-foreground text-sm">No participants</p>
             )}
           </div>
 
           {/* Queue */}
           <div className="panel">
-            <div className="text-[10px] text-[#9BA8C4] uppercase tracking-widest mb-3 font-semibold">Queue</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-3 font-semibold">Queue</div>
             <div className="flex flex-col gap-2">
               {queueDisplay.map((p, i) => p && (
                 <div key={p.id} className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg"
                   style={i === 0
-                    ? { background: 'rgba(245,200,66,0.08)', border: '1px solid rgba(245,200,66,0.25)' }
+                    ? { background: 'color-mix(in oklab, var(--primary) 8%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)' }
                     : { opacity: 0.6 + i * 0.05 }
                   }>
-                  <span className="font-display text-sm min-w-[18px] text-center text-[#9BA8C4]">{i + 1}</span>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: p.color }} />
-                  <span className="text-xs font-semibold text-[#F0EDD8] truncate">{p.name}</span>
-                  {i === 0 && <span className="text-[#F5C842] text-xs animate-turn-pulse ml-auto">▶</span>}
+                  <span className="font-display text-sm min-w-[18px] text-center text-muted-foreground">{i + 1}</span>
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
+                  <span className="text-xs font-semibold text-foreground truncate">{p.name}</span>
+                  {i === 0 && <span className="text-primary text-xs animate-turn-pulse ml-auto">▶</span>}
                 </div>
               ))}
               {round.participantQueue.length > 5 && (
-                <p className="text-[9px] text-[#4A5568] text-center">
+                <p className="text-[9px] text-subtle text-center">
                   +{round.participantQueue.length - 5} more
                 </p>
               )}

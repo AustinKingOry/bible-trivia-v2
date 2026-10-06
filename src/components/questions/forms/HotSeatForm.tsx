@@ -63,10 +63,10 @@ export function HotSeatForm({ value, onChange }: Props) {
           <button
             type="button"
             onClick={addAnswer}
-            className="px-4 py-2 rounded-lg font-bold text-sm transition-all flex-shrink-0"
-            style={{ background: 'rgba(245,200,66,0.15)', border: '1px solid rgba(245,200,66,0.3)', color: '#F5C842' }}
-            onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(245,200,66,0.28)')}
-            onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(245,200,66,0.15)')}
+            className="px-4 py-2 rounded-lg font-bold text-sm transition-all shrink-0"
+            style={{ background: 'color-mix(in oklab, var(--primary) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--primary) 30%, transparent)', color: 'var(--primary)' }}
+            onMouseOver={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--primary) 28%, transparent)')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'color-mix(in oklab, var(--primary) 15%, transparent)')}
           >
             + Add
           </button>
@@ -78,12 +78,12 @@ export function HotSeatForm({ value, onChange }: Props) {
               <span
                 key={a}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                style={{ background: 'rgba(26,138,74,0.15)', border: '1px solid rgba(26,138,74,0.35)', color: '#6DFFAA' }}
+                style={{ background: 'color-mix(in oklab, var(--success-solid) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--success-solid) 35%, transparent)', color: 'var(--success)' }}
               >
                 {a}
                 <button
                   onClick={() => removeAnswer(a)}
-                  className="text-[#6DFFAA]/60 hover:text-red-400 transition-colors leading-none"
+                  className="text-success/60 hover:text-red-400 transition-colors leading-none"
                 >
                   ×
                 </button>
@@ -92,13 +92,13 @@ export function HotSeatForm({ value, onChange }: Props) {
           </div>
         )}
         {hs.acceptableAnswers.length === 0 && (
-          <p className="text-[10px] text-[#9BA8C4]/60 italic">No answers added yet</p>
+          <p className="text-[10px] text-muted-foreground/60 italic">No answers added yet</p>
         )}
       </Field>
 
       <div
-        className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs text-[#9BA8C4]"
-        style={{ background: 'rgba(230,126,34,0.08)', border: '1px solid rgba(230,126,34,0.25)' }}
+        className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs text-muted-foreground"
+        style={{ background: 'color-mix(in oklab, var(--secondary) 8%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 25%, transparent)' }}
       >
         <span className="text-base">⏱</span>
         Timer runs for 30 seconds. Admin tracks answers in real time.

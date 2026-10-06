@@ -68,40 +68,40 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
         <div
           className="w-full max-w-sm rounded-2xl flex flex-col animate-slide-up"
           style={{
-            background: '#0D1E38',
-            border: '1.5px solid rgba(245,200,66,0.3)',
+            background: 'var(--sidebar)',
+            border: '1.5px solid color-mix(in oklab, var(--primary) 30%, transparent)',
             boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
           }}
         >
           {/* Header */}
           <div
             className="flex items-center justify-between px-6 py-5 border-b"
-            style={{ borderColor: 'rgba(245,200,66,0.18)' }}
+            style={{ borderColor: 'color-mix(in oklab, var(--primary) 18%, transparent)' }}
           >
             <div>
               <h2 className="font-display text-2xl tracking-widest text-gold-glow">
                 {modeLabel[mode].toUpperCase()}
               </h2>
-              <p className="text-[11px] text-[#9BA8C4] mt-0.5">
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {mode === 'signin' && 'Sign in to sync your data to the cloud'}
                 {mode === 'signup' && 'Create an account to save and sync your data'}
                 {mode === 'magic'  && 'Get a one-click sign-in link via email'}
               </p>
             </div>
-            <button onClick={onClose} className="text-[#9BA8C4] hover:text-white text-2xl transition-colors">×</button>
+            <button onClick={onClose} className="text-muted-foreground hover:text-white text-2xl transition-colors">×</button>
           </div>
 
           <div className="px-6 py-5 flex flex-col gap-4">
             {/* Mode tabs */}
-            <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid rgba(245,200,66,0.2)' }}>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid color-mix(in oklab, var(--primary) 20%, transparent)' }}>
               {(['signin', 'signup', 'magic'] as AuthMode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => { setMode(m); reset() }}
                   className="flex-1 py-2 text-xs font-semibold transition-all"
                   style={mode === m
-                    ? { background: 'rgba(245,200,66,0.15)', color: '#F5C842' }
-                    : { color: '#9BA8C4' }
+                    ? { background: 'color-mix(in oklab, var(--primary) 15%, transparent)', color: 'var(--primary)' }
+                    : { color: 'var(--muted-foreground)' }
                   }
                 >
                   {modeLabel[m]}
@@ -111,7 +111,7 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
 
             {/* Email */}
             <div>
-              <label className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase block mb-1.5">
+              <label className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase block mb-1.5">
                 Email
               </label>
               <input
@@ -121,22 +121,22 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
                 onKeyDown={(e) => e.key === 'Enter' && !loading && handleSubmit()}
                 placeholder="you@example.com"
                 autoFocus
-                className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
+                className="w-full px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden"
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(245,200,66,0.25)',
+                  background: 'color-mix(in oklab, var(--foreground) 6%, transparent)',
+                  border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)',
                   fontFamily: 'var(--font-body)',
                 }}
-                onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-                onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+                onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+                onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
               />
             </div>
 
             {/* Password (not shown for magic link) */}
             {mode !== 'magic' && (
               <div>
-                <label className="text-[10px] font-semibold tracking-widest text-[#9BA8C4] uppercase block mb-1.5">
-                  Password {mode === 'signup' && <span className="normal-case text-[#4A5568]">(min 6 characters)</span>}
+                <label className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase block mb-1.5">
+                  Password {mode === 'signup' && <span className="normal-case text-subtle">(min 6 characters)</span>}
                 </label>
                 <input
                   type="password"
@@ -144,14 +144,14 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
                   onChange={(e) => { setPassword(e.target.value); reset() }}
                   onKeyDown={(e) => e.key === 'Enter' && !loading && handleSubmit()}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2.5 rounded-lg text-sm text-[#F0EDD8] outline-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-foreground outline-hidden"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(245,200,66,0.25)',
+                    background: 'color-mix(in oklab, var(--foreground) 6%, transparent)',
+                    border: '1px solid color-mix(in oklab, var(--primary) 25%, transparent)',
                     fontFamily: 'var(--font-body)',
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = '#F5C842')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(245,200,66,0.25)')}
+                  onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+                  onBlur={(e) => (e.target.style.borderColor = 'color-mix(in oklab, var(--primary) 25%, transparent)')}
                 />
               </div>
             )}
@@ -160,10 +160,10 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
             {error && (
               <div
                 className="flex items-start gap-2 px-3 py-2.5 rounded-lg animate-slide-up"
-                style={{ background: 'rgba(192,57,43,0.15)', border: '1px solid rgba(192,57,43,0.4)' }}
+                style={{ background: 'color-mix(in oklab, var(--danger-solid) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--danger-solid) 40%, transparent)' }}
               >
-                <span className="text-base flex-shrink-0">⚠️</span>
-                <p className="text-xs text-[#FF8A80] leading-relaxed">{error}</p>
+                <span className="text-base shrink-0">⚠️</span>
+                <p className="text-xs text-danger leading-relaxed">{error}</p>
               </div>
             )}
 
@@ -171,10 +171,10 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
             {success && (
               <div
                 className="flex items-start gap-2 px-3 py-2.5 rounded-lg animate-slide-up"
-                style={{ background: 'rgba(26,138,74,0.15)', border: '1px solid rgba(26,138,74,0.4)' }}
+                style={{ background: 'color-mix(in oklab, var(--success-solid) 15%, transparent)', border: '1px solid color-mix(in oklab, var(--success-solid) 40%, transparent)' }}
               >
-                <span className="text-base flex-shrink-0">✉️</span>
-                <p className="text-xs text-[#6DFFAA] leading-relaxed">{success}</p>
+                <span className="text-base shrink-0">✉️</span>
+                <p className="text-xs text-success leading-relaxed">{success}</p>
               </div>
             )}
 
@@ -183,7 +183,7 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
               onClick={handleSubmit}
               disabled={loading}
               className="w-full py-3.5 rounded-xl font-display text-xl tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg,#F5C842,#C49A10)', color: '#0A1628' }}
+              style={{ background: 'linear-gradient(135deg,var(--primary),var(--primary-strong))', color: 'var(--background)' }}
               onMouseOver={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.opacity = '0.88' }}
               onMouseOut={(e) => { e.currentTarget.style.opacity = '1' }}
             >
@@ -191,7 +191,7 @@ export function AuthModal({ onClose, defaultMode = 'signin' }: Props) {
             </button>
 
             {/* Privacy note */}
-            <p className="text-center text-[10px] text-[#4A5568] leading-relaxed">
+            <p className="text-center text-[10px] text-subtle leading-relaxed">
               Your data stays local even without an account.{' '}
               Signing in enables cloud sync and backup.
             </p>

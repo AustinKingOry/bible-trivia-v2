@@ -210,26 +210,26 @@ export default function GamePage({
 
   const timerPct = maxTime ? Math.min(100, (timeLeft / maxTime) * 100) : 0
   const timerColor =
-    phase === 'team2-answering' ? '#2E86DE'
-    : phase === 'steal-offered'  ? '#2E86DE'
-    : timerPct > 60 ? '#F5C842'
-    : timerPct > 30 ? '#E67E22'
-    : '#C0392B'
+    phase === 'team2-answering' ? 'var(--info)'
+    : phase === 'steal-offered'  ? 'var(--info)'
+    : timerPct > 60 ? 'var(--primary)'
+    : timerPct > 30 ? 'var(--secondary)'
+    : 'var(--danger-solid)'
 
   const diffBadge: Record<string, string> = {
-    all:    'text-[#F5C842] border-[#F5C842]/50 bg-[#F5C842]/10',
-    easy:   'text-[#6DFFAA] border-[#1A8A4A]/50 bg-[#1A8A4A]/15',
-    medium: 'text-[#F5C842] border-[#F5C842]/50 bg-[#F5C842]/10',
-    hard:   'text-[#FF8A80] border-[#C0392B]/50 bg-[#C0392B]/15',
+    all:    'text-primary border-primary/50 bg-primary/10',
+    easy:   'text-success border-success-solid/50 bg-success-solid/15',
+    medium: 'text-primary border-primary/50 bg-primary/10',
+    hard:   'text-danger border-danger-solid/50 bg-danger-solid/15',
   }
 
   // ── Guards ─────────────────────────────────────────────────────────────────
   if (!round) {
     return (
-      <div className="flex items-center justify-center h-full text-[#9BA8C4]">
+      <div className="flex items-center justify-center h-full text-muted-foreground">
         <div className="text-center">
           <p className="text-xl mb-3">Round not found.</p>
-          <Link href={`/session/${sessionId}`} className="text-[#F5C842] underline">← Back to session</Link>
+          <Link href={`/session/${sessionId}`} className="text-primary underline">← Back to session</Link>
         </div>
       </div>
     )
@@ -250,25 +250,25 @@ export default function GamePage({
 
   // Phase badge text for header
   const phaseBadge =
-    phase === 'steal-offered'  ? { text: '⚡ STEAL AVAILABLE', color: '#2E86DE', bg: 'rgba(46,134,222,0.2)', border: 'rgba(46,134,222,0.5)' }
-    : phase === 'team2-answering' ? { text: `⚡ ${stealingTeam?.name ?? 'Team'} STEALING`, color: '#74B9FF', bg: 'rgba(46,134,222,0.25)', border: 'rgba(46,134,222,0.6)' }
+    phase === 'steal-offered'  ? { text: '⚡ STEAL AVAILABLE', color: 'var(--info)', bg: 'color-mix(in oklab, var(--info) 20%, transparent)', border: 'color-mix(in oklab, var(--info) 50%, transparent)' }
+    : phase === 'team2-answering' ? { text: `⚡ ${stealingTeam?.name ?? 'Team'} STEALING`, color: 'var(--info)', bg: 'color-mix(in oklab, var(--info) 25%, transparent)', border: 'color-mix(in oklab, var(--info) 60%, transparent)' }
     : null
 
   return (
     <div className="flex flex-col h-full">
       {/* Game header */}
       <header
-        className="border-b px-4 py-2.5 flex items-center gap-3 flex-shrink-0"
-        style={{ borderColor: 'rgba(245,200,66,0.25)', background: 'linear-gradient(135deg,#142240,#1E3360)' }}
+        className="border-b px-4 py-2.5 flex items-center gap-3 shrink-0 flex-wrap"
+        style={{ borderColor: 'color-mix(in oklab, var(--primary) 25%, transparent)', background: 'linear-gradient(135deg,var(--card),var(--surface))' }}
       >
-        <Link href={`/session/${sessionId}`} className="text-[#9BA8C4] hover:text-[#9c8950] text-base transition-colors">←</Link>
+        <Link href={`/session/${sessionId}`} className="text-muted-foreground hover:text-primary-strong text-base transition-colors">←</Link>
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div className="font-display text-lg tracking-widest text-gold-glow truncate">{round.name}</div>
           {round.topicTag && (() => {
             const t = allTopics.find((x) => x.tag === round.topicTag) ?? { emoji: '🏷️', label: round.topicTag }
             return (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
-                style={{ background: 'rgba(123,47,190,0.2)', border: '1px solid rgba(123,47,190,0.4)', color: '#C084FC' }}>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0"
+                style={{ background: 'color-mix(in oklab, var(--secondary) 20%, transparent)', border: '1px solid color-mix(in oklab, var(--secondary) 40%, transparent)', color: 'var(--secondary)' }}>
                 {t.emoji} {t.label}
               </span>
             )
@@ -280,8 +280,8 @@ export default function GamePage({
             {phaseBadge.text}
           </div>
         )}
-        <div className="flex items-center gap-1.5 text-xs text-[#9BA8C4] flex-shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#6DFFAA] animate-pulse" />
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
           Q {qIdx}/{qTotal}
         </div>
       </header>
@@ -314,13 +314,13 @@ export default function GamePage({
               <div className="panel flex items-center gap-4">
                 {phase === 'steal-offered' ? (
                   <div className="flex-1">
-                    <div className="text-[10px] text-[#74B9FF] uppercase tracking-widest mb-2 font-semibold">
+                    <div className="text-[10px] text-info uppercase tracking-widest mb-2 font-semibold">
                       ⚡ Steal available — pick which team attempts
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {otherTeams.map((t) => (
                         <span key={t.id} className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-semibold"
-                          style={{ background: `${t.color}22`, border: `1px solid ${t.color}55`, color: t.color }}>
+                          style={{ background: `color-mix(in oklab, ${t.color} 13%, transparent)`, border: `1px solid color-mix(in oklab, ${t.color} 33%, transparent)`, color: t.color }}>
                           <span className="w-2 h-2 rounded-full" style={{ background: t.color }} />{t.name}
                         </span>
                       ))}
@@ -328,14 +328,14 @@ export default function GamePage({
                   </div>
                 ) : phase === 'team2-answering' ? (
                   <div className="flex-1">
-                    <div className="text-[10px] text-[#74B9FF] uppercase tracking-widest mb-0.5 font-semibold">Stealing</div>
+                    <div className="text-[10px] text-info uppercase tracking-widest mb-0.5 font-semibold">Stealing</div>
                     <div className="font-display text-3xl tracking-wide" style={{ color: stealingTeam?.color }}>
                       {stealingTeam?.name ?? '—'}
                     </div>
                   </div>
                 ) : (
                   <div className="flex-1">
-                    <div className="text-[10px] text-[#9BA8C4] uppercase tracking-widest mb-0.5">Current Turn</div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Current Turn</div>
                     <div className="font-display text-3xl tracking-wide" style={{ color: currentTeam?.color }}>
                       {currentTeam?.name ?? '—'}
                     </div>
@@ -344,18 +344,18 @@ export default function GamePage({
 
                 {/* Timer clock — hide during steal-offered (no countdown) */}
                 {!isDone && phase !== 'steal-offered' && timeLeft > 0 && (
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <div className="font-display text-5xl tabular-nums leading-none"
-                      style={{ color: timerColor, textShadow: `0 0 20px ${timerColor}66` }}>
+                      style={{ color: timerColor, textShadow: `0 0 20px color-mix(in oklab, ${timerColor} 40%, transparent)` }}>
                       {timeLeft}
                     </div>
-                    <div className="text-[10px] text-[#9BA8C4] mt-0.5 uppercase tracking-wide">
+                    <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">
                       {phase === 'team2-answering' ? 'to steal' : isHotSeat ? 'remaining' : 'to answer'}
                     </div>
                   </div>
                 )}
                 {isDone && (
-                  <div className="text-[#F5C842] font-display text-lg tracking-wider">DONE ✓</div>
+                  <div className="text-primary font-display text-lg tracking-wider">DONE ✓</div>
                 )}
               </div>
 
