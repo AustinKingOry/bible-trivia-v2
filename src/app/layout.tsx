@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Bricolage_Grotesque, Figtree, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/shared/ThemeProvider'
+import { PwaProvider } from '@/components/shared/PwaProvider'
 import './globals.css'
 
 const heading = Bricolage_Grotesque({ subsets: ['latin'], variable: '--nf-heading', display: 'swap' })
@@ -65,15 +66,16 @@ export const metadata: Metadata = {
   // 🔹 Icons
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/apple-touch-icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/logo.svg", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-touch-icon.png" }],
-    shortcut: ["/apple-touch-icon.png"],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
 
   // 🔹 Manifest (PWA)
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.webmanifest",
 
   // 🔹 Open Graph (Facebook, WhatsApp, LinkedIn)
   openGraph: {
@@ -172,6 +174,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh bg-background font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
+          <PwaProvider />
         </ThemeProvider>
       </body>
     </html>
