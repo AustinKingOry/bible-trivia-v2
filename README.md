@@ -164,3 +164,11 @@ TO DO
 - Fonts: Bricolage Grotesque (display), Figtree (body), JetBrains Mono (numbers) via `next/font`.
 - Layout: bottom tab bar + top bar on phones, icon rail on tablets, full sidebar on desktop. The tab bar hides on live gameplay screens.
 - Team/difficulty data colors in `src/lib/data.ts` stay as hex on purpose (user-chosen data, not theme).
+
+## PWA
+- `src/app/manifest.ts` serves `/manifest.webmanifest` (standalone, start URL `/game`, shortcuts, any + maskable icons).
+- `public/sw.js` is a hand-written service worker: cache-first for fingerprinted assets, network-first pages with an offline fallback (`/offline`), and it never touches `/api` or Supabase. It only registers in production.
+- Updates are never forced mid-game: the app shows an "Update ready" prompt and reloads when you accept.
+- Install: Chrome/Edge/Android get an install banner (and a sidebar button); iOS Safari gets Add to Home Screen instructions.
+- Logo and every icon come from one definition in `scripts/generate-icons.mjs`; edit it and run `npm run icons`.
+- To ship a new service worker version, bump `VERSION` in `public/sw.js`.
