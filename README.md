@@ -14,9 +14,9 @@ npm run dev
 
 | Layer | Choice |
 |---|---|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js 15 (App Router) |
 | Language | TypeScript |
-| Styling | Tailwind CSS |
+| Styling | Tailwind CSS v4 (OKLCH tokens, light + dark via next-themes) |
 | State | Zustand + persist middleware |
 | Storage | localStorage (via Zustand) |
 | Future sync | Supabase (stubbed) |
@@ -159,3 +159,8 @@ The architecture is explicitly designed for:
 TO DO
 3. Create the pdf upload
 4. Implement backend (AI extraction and database integration)
+## Design system
+- Brand: emerald (primary) + orange (secondary). Tokens live in `src/app/globals.css` (`:root` for light, `.dark` for dark); components reference them as `var(--primary)` / `text-primary` etc. instead of hex.
+- Fonts: Bricolage Grotesque (display), Figtree (body), JetBrains Mono (numbers) via `next/font`.
+- Layout: bottom tab bar + top bar on phones, icon rail on tablets, full sidebar on desktop. The tab bar hides on live gameplay screens.
+- Team/difficulty data colors in `src/lib/data.ts` stay as hex on purpose (user-chosen data, not theme).
