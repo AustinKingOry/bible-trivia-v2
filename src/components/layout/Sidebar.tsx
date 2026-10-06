@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Gamepad2, ImageIcon, LibraryBig } from 'lucide-react'
+import { Download, Gamepad2, ImageIcon, LibraryBig } from 'lucide-react'
+import { usePwa } from '@/hooks/usePwa'
 import { SyncIndicator } from '@/components/layout/SyncIndicator'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { useGameStore } from '@/store/gameStore'
@@ -31,6 +32,7 @@ export function Sidebar() {
   const customCount = useGameStore((s) => Object.keys(s.customQuestions).length)
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/') || (href === '/game' && pathname.startsWith('/session/'))
   const immersive = IMMERSIVE.test(pathname)
+  const { canInstall, install } = usePwa()
 
   return (
     <>
@@ -68,6 +70,12 @@ export function Sidebar() {
           </div>
         )}
         <SyncIndicator />
+        {canInstall && (
+          <button onClick={install} title="Install app"
+            className="mx-2 mb-2 flex items-center justify-center gap-2 rounded-xl bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 lg:mx-3">
+            <Download size={18} className="shrink-0" /><span className="hidden lg:inline">Install app</span>
+          </button>
+        )}
         <div className="p-2 lg:p-3"><div className="hidden lg:block"><ThemeToggle /></div><div className="flex justify-center lg:hidden"><ThemeToggle compact /></div></div>
       </aside>
 
