@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from 'next'
+import { Bricolage_Grotesque, Figtree, JetBrains_Mono } from 'next/font/google'
+import { ThemeProvider } from '@/components/shared/ThemeProvider'
 import './globals.css'
+
+const heading = Bricolage_Grotesque({ subsets: ['latin'], variable: '--nf-heading', display: 'swap' })
+const body = Figtree({ subsets: ['latin'], variable: '--nf-body', display: 'swap' })
+const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--nf-mono', display: 'swap' })
 
 export const metadata: Metadata = {
   // 🔹 Basic
@@ -151,10 +157,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  viewportFit: 'cover',
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f1a16" },
   ],
   
   colorScheme: "light dark",
@@ -162,8 +168,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#0A1628]">{children}</body>
+    <html lang="en" suppressHydrationWarning className={`${heading.variable} ${body.variable} ${mono.variable}`}>
+      <body className="min-h-dvh bg-background font-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
